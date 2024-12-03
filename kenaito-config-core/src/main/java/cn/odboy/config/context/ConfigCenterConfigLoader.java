@@ -48,8 +48,6 @@ public class ConfigCenterConfigLoader {
      */
     private static final String DEFAULT_PATH_SEP_WIN = "\\";
     private static final String DEFAULT_PATH_SEP_MAC = "/";
-    @Autowired
-    private ConfigCenterProperties properties;
 
     @Bean
     public BeanFactoryPostProcessor configLoader(ConfigurableEnvironment environment) {
