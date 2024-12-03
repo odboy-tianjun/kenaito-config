@@ -1,0 +1,6 @@
+kenaito:
+  config-center:
+    meta: http://127.0.0.1:28002
+    data-id: kenaito-config-service
+    cache-dir: /home/admin/data
+    env: stage
