@@ -10,10 +10,10 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.MutablePropertySources;
 
 /**
  * 配置加载器
+ *
  * @author odboy
  * @date 2024-12-03
  */
@@ -28,27 +28,40 @@ public class ConfigCenterConfigLoader {
     private static final Integer DEFAULT_CONFIG_PORT = 28002;
     private static final String DEFAULT_CONFIG_ENV = "default";
     private static final String DEFAULT_CONFIG_DATA_ID = "default";
+    private static final String DEFAULT_PATH_WIN_SEP = ":";
+    /**
+     * 默认配置项
+     */
+    private static final String DEFAULT_CONFIG_NAME_SERVER = "kenaito.config-center.server";
+    private static final String DEFAULT_CONFIG_NAME_PORT = "kenaito.config-center.port";
+    private static final String DEFAULT_CONFIG_NAME_ENV = "kenaito.config-center.env";
+    private static final String DEFAULT_CONFIG_NAME_DATA_ID = "kenaito.config-center.data-id";
+    private static final String DEFAULT_CONFIG_NAME_CACHE_DIR = "kenaito.config-center.cache-dir";
     @Autowired
     private ConfigCenterProperties properties;
+
     @Bean
     public BeanFactoryPostProcessor configLoader(ConfigurableEnvironment environment) {
         return new BeanFactoryPostProcessor() {
             @Override
             public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-                String cacheDir;
+                String defaultCacheDir;
                 String os = System.getProperty("os.name");
                 if (os.toLowerCase().startsWith(OS_TYPE_WIN)) {
-                    cacheDir = DEFAULT_PATH_WIN;
+                    defaultCacheDir = DEFAULT_PATH_WIN;
                 } else if (os.toLowerCase().startsWith(OS_TYPE_MAC)) {
-                    cacheDir = DEFAULT_PATH_MAC;
-                }else {
-                    cacheDir = DEFAULT_PATH_MAC;
+                    defaultCacheDir = DEFAULT_PATH_MAC;
+                } else {
+                    defaultCacheDir = DEFAULT_PATH_MAC;
                 }
-                environment.getProperty("kenaito.config-center.server", String.class, DEFAULT_CONFIG_SERVER);
-                environment.getProperty("kenaito.config-center.port", Integer.class, DEFAULT_CONFIG_PORT);
-                environment.getProperty("kenaito.config-center.env", String.class, DEFAULT_CONFIG_ENV);
-                environment.getProperty("kenaito.config-center.data-id", String.class, DEFAULT_CONFIG_DATA_ID);
-                environment.getProperty("kenaito.config-center.cache-dir", String.class, cacheDir);
+                String server = environment.getProperty(DEFAULT_CONFIG_NAME_SERVER, String.class, DEFAULT_CONFIG_SERVER);
+                Integer port = environment.getProperty(DEFAULT_CONFIG_NAME_PORT, Integer.class, DEFAULT_CONFIG_PORT);
+                String env = environment.getProperty(DEFAULT_CONFIG_NAME_ENV, String.class, DEFAULT_CONFIG_ENV);
+                String dataId = environment.getProperty(DEFAULT_CONFIG_NAME_DATA_ID, String.class, DEFAULT_CONFIG_DATA_ID);
+                String cacheDir = environment.getProperty(DEFAULT_CONFIG_NAME_CACHE_DIR, String.class, defaultCacheDir);
+                if (defaultCacheDir.contains(DEFAULT_PATH_WIN_SEP) && !cacheDir.contains(DEFAULT_PATH_WIN_SEP)) {
+                    throw new RuntimeException(DEFAULT_CONFIG_NAME_CACHE_DIR + " 配置的路径不正确");
+                }
                 ConfigCenterClient client = new ConfigCenterClient();
                 try {
                     client.start(properties);
