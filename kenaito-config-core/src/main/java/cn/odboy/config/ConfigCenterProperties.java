@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "kenaito.config-center")
 public class ConfigCenterProperties {
-    private String meta;
+    private String server;
+    private Integer port;
     private String dataId;
     private String cacheDir;
     private String env;
