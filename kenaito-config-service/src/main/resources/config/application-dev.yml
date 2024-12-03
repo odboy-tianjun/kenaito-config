@@ -246,3 +246,6 @@ task:
     keep-alive-seconds: 60
     # 队列容量
     queue-capacity: 50
+kenaito:
+  config-center:
+    port: 28002

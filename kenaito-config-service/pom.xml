@@ -28,7 +28,7 @@
 
         <dependency>
             <groupId>cn.odboy</groupId>
-            <artifactId>kenaito-config-core</artifactId>
+            <artifactId>kenaito-config-common</artifactId>
             <version>1.0</version>
         </dependency>
 

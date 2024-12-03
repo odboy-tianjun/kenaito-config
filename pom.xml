@@ -13,8 +13,10 @@
         <module>kenaito-common</module>
         <module>kenaito-tools</module>
         <module>kenaito-system</module>
+        <module>kenaito-config-common</module>
         <module>kenaito-config-core</module>
         <module>kenaito-config-service</module>
+        <module>kenaito-config-demo</module>
     </modules>
 
     <name>Kenaito Config</name>
