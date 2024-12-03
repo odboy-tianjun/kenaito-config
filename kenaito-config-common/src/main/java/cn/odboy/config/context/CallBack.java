@@ -1,6 +1,4 @@
-
-
-package cn.odboy.infra.context;
+package cn.odboy.config.context;
 
 /**
  * @date: 2020/6/9 17:02

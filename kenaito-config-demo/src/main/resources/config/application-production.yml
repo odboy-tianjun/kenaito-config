@@ -2,6 +2,6 @@ kenaito:
   config-center:
     server: 127.0.0.1
     port: 28002
-    data-id: kenaito-config-service
+    data-id: kenaito-config-demo
     cache-dir: /home/admin/data
     env: production

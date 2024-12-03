@@ -1,11 +1,9 @@
 package cn.odboy.config.context;
 
 import cn.hutool.core.io.FileUtil;
-import cn.odboy.config.ConfigCenterProperties;
-import cn.odboy.config.netty.ConfigCenterClient;
+import cn.odboy.config.netty.ConfigClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +23,7 @@ import java.nio.file.Paths;
  */
 @Slf4j
 @Configuration
-public class ConfigCenterConfigLoader {
+public class ClientConfigLoader {
     private static final String OS_TYPE_WIN = "win";
     private static final String OS_TYPE_MAC = "mac";
     private static final String DEFAULT_PATH_WIN = "c:\\data";
@@ -55,21 +53,22 @@ public class ConfigCenterConfigLoader {
             @Override
             public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
                 String defaultCacheDir = getDefaultCacheDir();
-                String server = environment.getProperty(DEFAULT_CONFIG_NAME_SERVER, String.class, DEFAULT_CONFIG_SERVER);
-                Integer port = environment.getProperty(DEFAULT_CONFIG_NAME_PORT, Integer.class, DEFAULT_CONFIG_PORT);
-                String env = environment.getProperty(DEFAULT_CONFIG_NAME_ENV, String.class, DEFAULT_CONFIG_ENV);
-                String dataId = environment.getProperty(DEFAULT_CONFIG_NAME_DATA_ID, String.class, DEFAULT_CONFIG_DATA_ID);
-                String cacheDir = environment.getProperty(DEFAULT_CONFIG_NAME_CACHE_DIR, String.class, defaultCacheDir);
-                validateCacheDirPath(defaultCacheDir, cacheDir);
-                createCacheDir(cacheDir);
-                ConfigCenterClient client = new ConfigCenterClient();
+                ClientProp.server = environment.getProperty(DEFAULT_CONFIG_NAME_SERVER, String.class, DEFAULT_CONFIG_SERVER);
+                ClientProp.port = environment.getProperty(DEFAULT_CONFIG_NAME_PORT, Integer.class, DEFAULT_CONFIG_PORT);
+                ClientProp.env = environment.getProperty(DEFAULT_CONFIG_NAME_ENV, String.class, DEFAULT_CONFIG_ENV);
+                ClientProp.dataId = environment.getProperty(DEFAULT_CONFIG_NAME_DATA_ID, String.class, DEFAULT_CONFIG_DATA_ID);
+                ClientProp.cacheDir = environment.getProperty(DEFAULT_CONFIG_NAME_CACHE_DIR, String.class, defaultCacheDir);
+                log.info("客户端属性: {}", ClientProp.toPrint());
+                validateCacheDirPath(defaultCacheDir, ClientProp.cacheDir);
+                createCacheDir(ClientProp.cacheDir);
                 try {
-                    client.start(server, port);
+                    ConfigClient client = new ConfigClient();
+                    client.start(ClientProp.server, ClientProp.port);
                 } catch (InterruptedException e) {
                     log.error("Netty Client Start Error", e);
                     throw new RuntimeException(e);
                 }
-//                ConfigCenterClient client = new ConfigCenterClient("http://your-config-center-url/config");
+//                ConfigClient client = new ConfigClient("http://your-config-center-url/config");
 //                Map<String, Object> configKv = client.fetchConfig();
 //                MapPropertySource propertySource = new MapPropertySource("configCenter", configKv);
 //                environment.getPropertySources().addFirst(propertySource);

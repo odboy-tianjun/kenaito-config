@@ -1,5 +1,4 @@
 package cn.odboy.config.netty;
-import cn.odboy.config.ConfigCenterProperties;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -11,7 +10,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ConfigCenterClient {
+public class ConfigClient {
     public void start(String server, Integer port) throws InterruptedException {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
@@ -21,7 +20,7 @@ public class ConfigCenterClient {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline pipeline = ch.pipeline();
-                            pipeline.addLast(new ConfigCenterClientHandler());
+                            pipeline.addLast(new ConfigClientHandler());
                         }
                     });
             log.info("Netty Client Start...");
