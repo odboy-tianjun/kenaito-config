@@ -17,5 +17,5 @@ public class Message implements Serializable {
      * updateConfig 更新配置<br/>
      */
     private String type;
-
+    private Object data;
 }

@@ -1,6 +1,7 @@
 package cn.odboy.config.context;
 
 import cn.hutool.core.io.FileUtil;
+import cn.odboy.config.model.ClientProp;
 import cn.odboy.config.netty.ConfigClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -46,6 +47,10 @@ public class ClientConfigLoader {
      */
     private static final String DEFAULT_PATH_SEP_WIN = "\\";
     private static final String DEFAULT_PATH_SEP_MAC = "/";
+    /**
+     * 当前客户端配置
+     */
+    public static ClientProp clientProp = new ClientProp();
 
     @Bean
     public BeanFactoryPostProcessor configLoader(ConfigurableEnvironment environment) {
@@ -53,17 +58,17 @@ public class ClientConfigLoader {
             @Override
             public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
                 String defaultCacheDir = getDefaultCacheDir();
-                ClientProp.server = environment.getProperty(DEFAULT_CONFIG_NAME_SERVER, String.class, DEFAULT_CONFIG_SERVER);
-                ClientProp.port = environment.getProperty(DEFAULT_CONFIG_NAME_PORT, Integer.class, DEFAULT_CONFIG_PORT);
-                ClientProp.env = environment.getProperty(DEFAULT_CONFIG_NAME_ENV, String.class, DEFAULT_CONFIG_ENV);
-                ClientProp.dataId = environment.getProperty(DEFAULT_CONFIG_NAME_DATA_ID, String.class, DEFAULT_CONFIG_DATA_ID);
-                ClientProp.cacheDir = environment.getProperty(DEFAULT_CONFIG_NAME_CACHE_DIR, String.class, defaultCacheDir);
-                log.info("客户端属性: {}", ClientProp.toPrint());
-                validateCacheDirPath(defaultCacheDir, ClientProp.cacheDir);
-                createCacheDir(ClientProp.cacheDir);
+                clientProp.setServer(environment.getProperty(DEFAULT_CONFIG_NAME_SERVER, String.class, DEFAULT_CONFIG_SERVER));
+                clientProp.setPort(environment.getProperty(DEFAULT_CONFIG_NAME_PORT, Integer.class, DEFAULT_CONFIG_PORT));
+                clientProp.setEnv(environment.getProperty(DEFAULT_CONFIG_NAME_ENV, String.class, DEFAULT_CONFIG_ENV));
+                clientProp.setDataId(environment.getProperty(DEFAULT_CONFIG_NAME_DATA_ID, String.class, DEFAULT_CONFIG_DATA_ID));
+                clientProp.setCacheDir(environment.getProperty(DEFAULT_CONFIG_NAME_CACHE_DIR, String.class, defaultCacheDir));
+                log.info("客户端属性: {}", clientProp.toString());
+                validateCacheDirPath(defaultCacheDir, clientProp.getCacheDir());
+                createCacheDir(clientProp.getCacheDir());
                 try {
                     ConfigClient client = new ConfigClient();
-                    client.start(ClientProp.server, ClientProp.port);
+                    client.start(clientProp.getServer(), clientProp.getPort());
                 } catch (InterruptedException e) {
                     log.error("Netty Client Start Error", e);
                     throw new RuntimeException(e);

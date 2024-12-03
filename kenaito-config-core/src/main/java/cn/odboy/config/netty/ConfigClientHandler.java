@@ -20,7 +20,7 @@ public class ConfigClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.err.println("当Channel处于活动状态（已经连接到它的远程节点）时被调用");
-        System.err.println("MyClientHandler发送数据");
+        System.err.println("注册客户端");
         //ctx.writeAndFlush("测试String编解码");
         // 测试对象编解码
         //ctx.writeAndFlush(new ConfigKv("app.config", "张三"));
