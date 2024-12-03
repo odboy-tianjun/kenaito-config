@@ -49,12 +49,6 @@
             <version>${jjwt.version}</version>
         </dependency>
 
-        <!-- quartz -->
-        <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz</artifactId>
-        </dependency>
-
         <!-- linux的管理 -->
         <dependency>
             <groupId>ch.ethz.ganymed</groupId>
