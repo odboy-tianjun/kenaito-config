@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ConfigCenterClient {
-    public void start(ConfigCenterProperties properties) throws InterruptedException {
+    public void start(String server, Integer port) throws InterruptedException {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap();
@@ -25,7 +25,7 @@ public class ConfigCenterClient {
                         }
                     });
             log.info("Netty Client Start...");
-            ChannelFuture channelFuture = bootstrap.connect(properties.getServer(), properties.getPort()).sync();
+            ChannelFuture channelFuture = bootstrap.connect(server, port).sync();
             channelFuture.channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully();
