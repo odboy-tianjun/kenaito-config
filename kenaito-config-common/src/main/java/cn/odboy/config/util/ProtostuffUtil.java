@@ -1,6 +1,6 @@
 package cn.odboy.config.util;
 
-import cn.odboy.config.model.ConfigKv;
+import cn.odboy.config.model.msgtype.ConfigKv;
 import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;
 import com.dyuproject.protostuff.Schema;

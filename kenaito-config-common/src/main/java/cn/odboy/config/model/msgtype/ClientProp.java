@@ -1,4 +1,4 @@
-package cn.odboy.config.model;
+package cn.odboy.config.model.msgtype;
 
 import lombok.Data;
 

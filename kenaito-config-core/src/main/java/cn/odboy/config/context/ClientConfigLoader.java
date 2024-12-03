@@ -1,7 +1,7 @@
 package cn.odboy.config.context;
 
 import cn.hutool.core.io.FileUtil;
-import cn.odboy.config.model.ClientProp;
+import cn.odboy.config.model.msgtype.ClientProp;
 import cn.odboy.config.netty.ConfigClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
