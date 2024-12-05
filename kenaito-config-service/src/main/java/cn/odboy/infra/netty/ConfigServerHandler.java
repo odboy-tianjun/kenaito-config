@@ -1,8 +1,9 @@
 package cn.odboy.infra.netty;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.odboy.config.constant.ConfigClientMsgType;
-import cn.odboy.config.model.Message;
+import cn.odboy.config.model.SmallMessage;
 import cn.odboy.config.model.msgtype.ClientProp;
 import cn.odboy.config.util.ProtostuffUtil;
 import io.netty.buffer.ByteBuf;
@@ -16,14 +17,27 @@ public class ConfigServerHandler extends ChannelInboundHandlerAdapter {
         ByteBuf buf = (ByteBuf) msg;
         byte[] bytes = new byte[buf.readableBytes()];
         buf.readBytes(bytes);
-        System.err.println("ServerHandler -> 从客户端读取到Object：" + ProtostuffUtil.deserializer(bytes, Message.class));
-        Message message = ProtostuffUtil.deserializer(bytes, Message.class);
-        if (ConfigClientMsgType.REGISTER.equals(message.getType())) {
-            ClientProp clientProp = (ClientProp) message.getData();
-            if (clientProp == null) {
-                throw new RuntimeException("ServerHandler -> 解析客户端属性失败");
+        System.err.println("ServerHandler -> 从客户端读取到Object：" + ProtostuffUtil.deserializer(bytes, SmallMessage.class));
+        SmallMessage smallMessage = ProtostuffUtil.deserializer(bytes, SmallMessage.class);
+        if (ConfigClientMsgType.REGISTER == smallMessage.getType()) {
+            SmallMessage.Response resp = smallMessage.getResp();
+            if (!resp.getSuccess() || resp.getData() == null) {
+                ctx.channel().writeAndFlush(new SmallMessage(ConfigClientMsgType.REGISTER, SmallMessage.Response.bad("解析客户端属性失败")));
+                return;
             }
+            ClientProp clientProp = (ClientProp) resp.getData();
+            if (StrUtil.isBlank(clientProp.getEnv())) {
+                ctx.channel().writeAndFlush(new SmallMessage(ConfigClientMsgType.REGISTER, SmallMessage.Response.bad("解析客户端属性失败")));
+                return;
+            }
+            if (StrUtil.isBlank(clientProp.getDataId())) {
+                ctx.channel().writeAndFlush(new SmallMessage(ConfigClientMsgType.REGISTER, SmallMessage.Response.bad("解析客户端属性失败")));
+                return;
+            }
+            ctx.channel().writeAndFlush(new SmallMessage(ConfigClientMsgType.REGISTER, SmallMessage.Response.ok(null)));
             ConfigClientManage.register(clientProp.getEnv(), clientProp.getDataId(), ctx);
+        } else if (ConfigClientMsgType.PULL_CONFIG == smallMessage.getType()) {
+
         }
     }
 

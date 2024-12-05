@@ -1,7 +1,7 @@
 package cn.odboy.config.constant;
 
 public interface ConfigClientMsgType {
-    String REGISTER = "register";
-    String PULL_CONFIG = "pullConfig";
-    String UPDATE_CONFIG = "updateConfig";
+    int REGISTER = 1;
+    int PULL_CONFIG = 2;
+    int UPDATE_CONFIG = 3;
 }
