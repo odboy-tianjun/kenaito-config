@@ -11,28 +11,28 @@
  Target Server Version : 80025
  File Encoding         : 65001
 
- Date: 03/12/2024 19:22:40
+ Date: 05/12/2024 18:31:07
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
--- Table structure for config_info
+-- Table structure for config_file
 -- ----------------------------
-DROP TABLE IF EXISTS `config_info`;
-CREATE TABLE `config_info`  (
+DROP TABLE IF EXISTS `config_file`;
+CREATE TABLE `config_file`  (
   `id` bigint(0) NOT NULL AUTO_INCREMENT,
-  `app_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `env` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `config_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `config_value` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `app_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `env` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `filename` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '例如: application-daily.properties',
+  `content` longblob NOT NULL,
   `version` bigint(0) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '配置文件' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of config_info
+-- Records of config_file
 -- ----------------------------
 
 -- ----------------------------
@@ -97,7 +97,7 @@ CREATE TABLE `system_dict`  (
   `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建日期',
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`dict_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '数据字典' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '数据字典' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of system_dict
@@ -105,6 +105,7 @@ CREATE TABLE `system_dict`  (
 INSERT INTO `system_dict` VALUES (1, 'user_status', '用户状态', 'admin', 'admin', '2024-09-30 18:45:18', '2024-09-30 18:45:18');
 INSERT INTO `system_dict` VALUES (4, 'dept_status', '部门状态', 'admin', 'admin', '2024-09-30 18:45:18', '2024-09-30 18:45:18');
 INSERT INTO `system_dict` VALUES (5, 'job_status', '岗位状态', 'admin', 'admin', '2024-09-30 18:45:18', '2024-09-30 18:45:18');
+INSERT INTO `system_dict` VALUES (8, 'config_center_env', '配置中心环境', 'admin', 'admin', '2024-12-05 18:03:51', '2024-12-05 18:03:51');
 
 -- ----------------------------
 -- Table structure for system_dict_detail
@@ -122,7 +123,7 @@ CREATE TABLE `system_dict_detail`  (
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`detail_id`) USING BTREE,
   INDEX `FK5tpkputc6d9nboxojdbgnpmyb`(`dict_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '数据字典详情' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '数据字典详情' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of system_dict_detail
@@ -133,6 +134,9 @@ INSERT INTO `system_dict_detail` VALUES (3, 4, '启用', 'true', 1, 'admin', 'ad
 INSERT INTO `system_dict_detail` VALUES (4, 4, '停用', 'false', 2, 'admin', 'admin', '2024-09-30 18:45:18', '2024-09-30 18:45:18');
 INSERT INTO `system_dict_detail` VALUES (5, 5, '启用', 'true', 1, 'admin', 'admin', '2024-09-30 18:45:18', '2024-09-30 18:45:18');
 INSERT INTO `system_dict_detail` VALUES (6, 5, '停用', 'false', 2, 'admin', 'admin', '2024-09-30 18:45:18', '2024-09-30 18:45:18');
+INSERT INTO `system_dict_detail` VALUES (14, 8, 'DAILY', 'daily', 1, 'admin', 'admin', '2024-12-05 18:04:35', '2024-12-05 18:04:35');
+INSERT INTO `system_dict_detail` VALUES (15, 8, 'STAGE', 'stage', 2, 'admin', 'admin', '2024-12-05 18:04:55', '2024-12-05 18:04:55');
+INSERT INTO `system_dict_detail` VALUES (16, 8, 'PROD', 'prod', 3, 'admin', 'admin', '2024-12-05 18:05:45', '2024-12-05 18:05:45');
 
 -- ----------------------------
 -- Table structure for system_job
@@ -207,7 +211,6 @@ INSERT INTO `system_menu` VALUES (22, 21, 2, 0, '二级菜单1', NULL, '', 999, 
 INSERT INTO `system_menu` VALUES (23, 21, 0, 1, '二级菜单2', NULL, 'nested/menu2/index', 999, 'menu', 'menu2', b'0', b'0', b'0', NULL, 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
 INSERT INTO `system_menu` VALUES (24, 22, 0, 1, '三级菜单1', 'Test', 'nested/menu1/menu1-1', 999, 'menu', 'menu1-1', b'0', b'0', b'0', NULL, 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
 INSERT INTO `system_menu` VALUES (27, 22, 0, 1, '三级菜单2', NULL, 'nested/menu1/menu1-2', 999, 'menu', 'menu1-2', b'0', b'0', b'0', NULL, 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
-INSERT INTO `system_menu` VALUES (28, 131, 3, 1, '任务调度', 'Timing', 'system/timing/index', 9, 'timing', 'timing', b'0', b'0', b'0', 'timing:list', 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
 INSERT INTO `system_menu` VALUES (33, 10, 0, 1, 'Markdown', 'Markdown', 'components/MarkDown', 53, 'markdown', 'markdown', b'0', b'0', b'0', NULL, 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
 INSERT INTO `system_menu` VALUES (34, 10, 0, 1, 'Yaml编辑器', 'YamlEdit', 'components/YamlEdit', 54, 'dev', 'yaml', b'0', b'0', b'0', NULL, 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
 INSERT INTO `system_menu` VALUES (35, 130, 3, 1, '部门管理', 'Dept', 'system/dept/index', 6, 'dept', 'dept', b'0', b'0', b'0', 'dept:list', 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
@@ -233,9 +236,6 @@ INSERT INTO `system_menu` VALUES (62, 37, 0, 2, '岗位删除', NULL, '', 4, '',
 INSERT INTO `system_menu` VALUES (64, 39, 0, 2, '字典新增', NULL, '', 2, '', '', b'0', b'0', b'0', 'dict:add', 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
 INSERT INTO `system_menu` VALUES (65, 39, 0, 2, '字典编辑', NULL, '', 3, '', '', b'0', b'0', b'0', 'dict:edit', 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
 INSERT INTO `system_menu` VALUES (66, 39, 0, 2, '字典删除', NULL, '', 4, '', '', b'0', b'0', b'0', 'dict:del', 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
-INSERT INTO `system_menu` VALUES (73, 28, 0, 2, '任务新增', NULL, '', 2, '', '', b'0', b'0', b'0', 'timing:add', 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
-INSERT INTO `system_menu` VALUES (74, 28, 0, 2, '任务编辑', NULL, '', 3, '', '', b'0', b'0', b'0', 'timing:edit', 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
-INSERT INTO `system_menu` VALUES (75, 28, 0, 2, '任务删除', NULL, '', 4, '', '', b'0', b'0', b'0', 'timing:del', 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
 INSERT INTO `system_menu` VALUES (77, 18, 0, 2, '上传文件', NULL, '', 2, '', '', b'0', b'0', b'0', 'storage:add', 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
 INSERT INTO `system_menu` VALUES (78, 18, 0, 2, '文件编辑', NULL, '', 3, '', '', b'0', b'0', b'0', 'storage:edit', 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
 INSERT INTO `system_menu` VALUES (79, 18, 0, 2, '文件删除', NULL, '', 4, '', '', b'0', b'0', b'0', 'storage:del', 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
@@ -248,60 +248,7 @@ INSERT INTO `system_menu` VALUES (121, 10, 0, 1, '窗口拆分', 'SplitPaneDemo'
 INSERT INTO `system_menu` VALUES (122, 10, 0, 1, '一键复制', 'ClipboardDemo', 'components/ClipboardDemo', 999, 'app', 'clipboardDemo', b'0', b'1', b'0', NULL, 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
 INSERT INTO `system_menu` VALUES (123, 10, 0, 1, 'WebSocket', 'WebSocketDemo', 'components/WebSocketDemo', 999, 'app', 'webSocketDemo', b'0', b'1', b'0', NULL, 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
 INSERT INTO `system_menu` VALUES (130, NULL, 5, 0, '用户中心', NULL, NULL, 4, 'peoples', 'sso', b'0', b'0', b'0', NULL, 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
-INSERT INTO `system_menu` VALUES (131, NULL, 6, 0, '系统管理', NULL, NULL, 999, 'system1', 'sysconfig', b'0', b'0', b'0', NULL, 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
-
--- ----------------------------
--- Table structure for system_quartz_job
--- ----------------------------
-DROP TABLE IF EXISTS `system_quartz_job`;
-CREATE TABLE `system_quartz_job`  (
-  `id` bigint(0) NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `module_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '所属模块',
-  `bean_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'Spring Bean名称',
-  `cron_expression` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'cron 表达式',
-  `is_pause` bit(1) NULL DEFAULT NULL COMMENT '状态：1暂停、0启用',
-  `job_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '任务名称',
-  `method_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '方法名称',
-  `params` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '参数',
-  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
-  `person_in_charge` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '负责人',
-  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '报警邮箱',
-  `sub_task` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '子任务ID',
-  `pause_after_failure` bit(1) NULL DEFAULT NULL COMMENT '任务失败后是否暂停',
-  `create_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '创建者',
-  `update_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '更新者',
-  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建日期',
-  `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `inx_is_pause`(`is_pause`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '定时任务' ROW_FORMAT = Compact;
-
--- ----------------------------
--- Records of system_quartz_job
--- ----------------------------
-INSERT INTO `system_quartz_job` VALUES (1, '配置中心', 'syncConfigXxxJob', '0/30 * * * * ? *', b'1', '同步配置中心Xxx任务', 'run', NULL, '同步配置中心Xxx任务', 'admin', NULL, NULL, b'1', 'admin', 'admin', '2024-11-18 21:54:33', '2024-11-18 21:54:33');
-
--- ----------------------------
--- Table structure for system_quartz_log
--- ----------------------------
-DROP TABLE IF EXISTS `system_quartz_log`;
-CREATE TABLE `system_quartz_log`  (
-  `id` bigint(0) NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `bean_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `create_time` datetime(0) NULL DEFAULT NULL,
-  `cron_expression` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `exception_detail` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
-  `is_success` bit(1) NULL DEFAULT NULL,
-  `job_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `method_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `params` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `time` bigint(0) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6844 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '定时任务日志' ROW_FORMAT = Compact;
-
--- ----------------------------
--- Records of system_quartz_log
--- ----------------------------
+INSERT INTO `system_menu` VALUES (131, NULL, 5, 0, '系统管理', NULL, NULL, 999, 'system1', 'sysconfig', b'0', b'0', b'0', NULL, 'admin', 'admin', '2024-11-15 22:12:18', '2024-11-15 22:12:18');
 
 -- ----------------------------
 -- Table structure for system_role
@@ -372,7 +319,6 @@ INSERT INTO `system_roles_menus` VALUES (22, 1);
 INSERT INTO `system_roles_menus` VALUES (23, 1);
 INSERT INTO `system_roles_menus` VALUES (24, 1);
 INSERT INTO `system_roles_menus` VALUES (27, 1);
-INSERT INTO `system_roles_menus` VALUES (28, 1);
 INSERT INTO `system_roles_menus` VALUES (33, 1);
 INSERT INTO `system_roles_menus` VALUES (34, 1);
 INSERT INTO `system_roles_menus` VALUES (35, 1);
@@ -398,9 +344,6 @@ INSERT INTO `system_roles_menus` VALUES (62, 1);
 INSERT INTO `system_roles_menus` VALUES (64, 1);
 INSERT INTO `system_roles_menus` VALUES (65, 1);
 INSERT INTO `system_roles_menus` VALUES (66, 1);
-INSERT INTO `system_roles_menus` VALUES (73, 1);
-INSERT INTO `system_roles_menus` VALUES (74, 1);
-INSERT INTO `system_roles_menus` VALUES (75, 1);
 INSERT INTO `system_roles_menus` VALUES (77, 1);
 INSERT INTO `system_roles_menus` VALUES (78, 1);
 INSERT INTO `system_roles_menus` VALUES (79, 1);
