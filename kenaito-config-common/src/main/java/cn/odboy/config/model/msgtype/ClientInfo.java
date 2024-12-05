@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class ClientProp implements Serializable {
+public class ClientInfo implements Serializable {
     private String server;
     private Integer port;
     private String env;

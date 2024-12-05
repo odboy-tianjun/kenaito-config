@@ -43,6 +43,8 @@ public class ConfigClient {
             bootstrap = new Bootstrap();
             bootstrap.group(eventLoopGroup)
                     .option(ChannelOption.SO_KEEPALIVE, true)
+                    // 设置接收缓冲区大小为10MB
+                    .option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(1024 * 1024 * 10))
                     .channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override

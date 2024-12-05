@@ -1,7 +1,7 @@
 package cn.odboy.config.context;
 
 import cn.hutool.core.io.FileUtil;
-import cn.odboy.config.model.msgtype.ClientProp;
+import cn.odboy.config.model.msgtype.ClientInfo;
 import cn.odboy.config.netty.ConfigClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -10,11 +10,14 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 配置加载器
@@ -50,7 +53,15 @@ public class ClientConfigLoader {
     /**
      * 当前客户端配置
      */
-    public static ClientProp clientProp = new ClientProp();
+    public static final ClientInfo clientInfo = new ClientInfo();
+    /**
+     * 配置是否加载完毕
+     */
+    public static boolean isConfigLoaded = false;
+    /**
+     * 所有的配置信息
+     */
+    public static Map<String, Object> lastConfigs = new HashMap<>();
 
     @Bean
     public BeanFactoryPostProcessor configLoader(ConfigurableEnvironment environment) {
@@ -58,25 +69,35 @@ public class ClientConfigLoader {
             @Override
             public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
                 String defaultCacheDir = getDefaultCacheDir();
-                clientProp.setServer(environment.getProperty(DEFAULT_CONFIG_NAME_SERVER, String.class, DEFAULT_CONFIG_SERVER));
-                clientProp.setPort(environment.getProperty(DEFAULT_CONFIG_NAME_PORT, Integer.class, DEFAULT_CONFIG_PORT));
-                clientProp.setEnv(environment.getProperty(DEFAULT_CONFIG_NAME_ENV, String.class, DEFAULT_CONFIG_ENV));
-                clientProp.setDataId(environment.getProperty(DEFAULT_CONFIG_NAME_DATA_ID, String.class, DEFAULT_CONFIG_DATA_ID));
-                clientProp.setCacheDir(environment.getProperty(DEFAULT_CONFIG_NAME_CACHE_DIR, String.class, defaultCacheDir));
-                log.info("客户端属性: {}", clientProp.toString());
-                validateCacheDirPath(defaultCacheDir, clientProp.getCacheDir());
-                createCacheDir(clientProp.getCacheDir());
+                clientInfo.setServer(environment.getProperty(DEFAULT_CONFIG_NAME_SERVER, String.class, DEFAULT_CONFIG_SERVER));
+                clientInfo.setPort(environment.getProperty(DEFAULT_CONFIG_NAME_PORT, Integer.class, DEFAULT_CONFIG_PORT));
+                clientInfo.setEnv(environment.getProperty(DEFAULT_CONFIG_NAME_ENV, String.class, DEFAULT_CONFIG_ENV));
+                clientInfo.setDataId(environment.getProperty(DEFAULT_CONFIG_NAME_DATA_ID, String.class, DEFAULT_CONFIG_DATA_ID));
+                clientInfo.setCacheDir(environment.getProperty(DEFAULT_CONFIG_NAME_CACHE_DIR, String.class, defaultCacheDir));
+                log.info("客户端属性: {}", clientInfo);
+                validateCacheDirPath(defaultCacheDir, clientInfo.getCacheDir());
+                createCacheDir(clientInfo.getCacheDir());
                 try {
                     ConfigClient client = new ConfigClient();
-                    client.start(clientProp.getServer(), clientProp.getPort());
+                    client.start(clientInfo.getServer(), clientInfo.getPort());
+                    // 这里加个同步锁，等客户端准备就绪后，拉取配置完成时
+                    synchronized (clientInfo) {
+                        while (!isConfigLoaded) {
+                            try {
+                                // 等待配置加载完成
+                                clientInfo.wait();
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                                log.error("Thread interrupted", e);
+                            }
+                        }
+                        MapPropertySource propertySource = new MapPropertySource("loadFormServer", lastConfigs);
+                        environment.getPropertySources().addFirst(propertySource);
+                    }
                 } catch (InterruptedException e) {
                     log.error("Netty Client Start Error", e);
                     throw new RuntimeException(e);
                 }
-//                ConfigClient client = new ConfigClient("http://your-config-center-url/config");
-//                Map<String, Object> configKv = client.fetchConfig();
-//                MapPropertySource propertySource = new MapPropertySource("configCenter", configKv);
-//                environment.getPropertySources().addFirst(propertySource);
             }
         };
     }

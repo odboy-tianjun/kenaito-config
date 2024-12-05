@@ -1,10 +1,11 @@
 package cn.odboy.config.util;
 
-import cn.odboy.config.model.msgtype.ConfigKv;
+import cn.odboy.config.model.msgtype.ConfigFileInfo;
 import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;
 import com.dyuproject.protostuff.Schema;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -66,8 +67,8 @@ public class ProtostuffUtil {
     }
 
     public static void main(String[] args) {
-        byte[] userBytes = ProtostuffUtil.serializer(new ConfigKv("app.config", "zhuge"));
-        ConfigKv user = ProtostuffUtil.deserializer(userBytes, ConfigKv.class);
+        byte[] userBytes = ProtostuffUtil.serializer(new ConfigFileInfo());
+        ConfigFileInfo user = ProtostuffUtil.deserializer(userBytes, ConfigFileInfo.class);
         System.out.println(user);
     }
 }

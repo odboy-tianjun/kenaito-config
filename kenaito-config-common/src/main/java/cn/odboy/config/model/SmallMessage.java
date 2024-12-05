@@ -1,5 +1,6 @@
 package cn.odboy.config.model;
 
+import cn.odboy.config.constant.TransferMessageType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,9 +12,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class SmallMessage implements Serializable {
     /**
-     * 消息类型：cn.odboy.config.constant.ConfigClientMsgType
+     * 消息类型：cn.odboy.config.constant.TransferMessageType
      */
-    private int type;
+    private TransferMessageType type;
     private Response resp;
 
     @Data

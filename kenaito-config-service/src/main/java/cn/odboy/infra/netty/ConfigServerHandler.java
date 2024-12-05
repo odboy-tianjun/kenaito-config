@@ -2,42 +2,69 @@ package cn.odboy.infra.netty;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.odboy.config.constant.ConfigClientMsgType;
+import cn.odboy.config.constant.TransferMessageType;
 import cn.odboy.config.model.SmallMessage;
-import cn.odboy.config.model.msgtype.ClientProp;
-import cn.odboy.config.util.ProtostuffUtil;
-import io.netty.buffer.ByteBuf;
+import cn.odboy.config.model.msgtype.ClientInfo;
+import cn.odboy.config.model.msgtype.ConfigFileInfo;
+import cn.odboy.config.util.MessageUtil;
+import cn.odboy.service.ConfigFileService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
+import java.util.List;
+
 public class ConfigServerHandler extends ChannelInboundHandlerAdapter {
+    private final ConfigFileService configFileService;
+
+    public ConfigServerHandler(ConfigFileService configFileService) {
+        this.configFileService = configFileService;
+    }
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.err.println("ServerHandler -> 当从Channel读取数据时被调用");
-        ByteBuf buf = (ByteBuf) msg;
-        byte[] bytes = new byte[buf.readableBytes()];
-        buf.readBytes(bytes);
-        System.err.println("ServerHandler -> 从客户端读取到Object：" + ProtostuffUtil.deserializer(bytes, SmallMessage.class));
-        SmallMessage smallMessage = ProtostuffUtil.deserializer(bytes, SmallMessage.class);
-        if (ConfigClientMsgType.REGISTER == smallMessage.getType()) {
-            SmallMessage.Response resp = smallMessage.getResp();
-            if (!resp.getSuccess() || resp.getData() == null) {
-                ctx.channel().writeAndFlush(new SmallMessage(ConfigClientMsgType.REGISTER, SmallMessage.Response.bad("解析客户端属性失败")));
-                return;
-            }
-            ClientProp clientProp = (ClientProp) resp.getData();
-            if (StrUtil.isBlank(clientProp.getEnv())) {
-                ctx.channel().writeAndFlush(new SmallMessage(ConfigClientMsgType.REGISTER, SmallMessage.Response.bad("解析客户端属性失败")));
-                return;
-            }
-            if (StrUtil.isBlank(clientProp.getDataId())) {
-                ctx.channel().writeAndFlush(new SmallMessage(ConfigClientMsgType.REGISTER, SmallMessage.Response.bad("解析客户端属性失败")));
-                return;
-            }
-            ctx.channel().writeAndFlush(new SmallMessage(ConfigClientMsgType.REGISTER, SmallMessage.Response.ok(null)));
-            ConfigClientManage.register(clientProp.getEnv(), clientProp.getDataId(), ctx);
-        } else if (ConfigClientMsgType.PULL_CONFIG == smallMessage.getType()) {
-
+//        System.err.println("ServerHandler -> 当从Channel读取数据时被调用");
+        SmallMessage smallMessage = MessageUtil.getMessage(msg);
+        System.err.println("ServerHandler -> 从客户端读取到Object：" + smallMessage);
+        SmallMessage.Response resp = smallMessage.getResp();
+        switch (smallMessage.getType()) {
+            case REGISTER:
+                if (!resp.getSuccess() || resp.getData() == null) {
+                    ctx.writeAndFlush(MessageUtil.toByteBuf(new SmallMessage(TransferMessageType.REGISTER, SmallMessage.Response.bad("解析客户端属性失败"))));
+                    return;
+                }
+                ClientInfo clientInfo = (ClientInfo) resp.getData();
+                if (StrUtil.isBlank(clientInfo.getEnv())) {
+                    ctx.writeAndFlush(MessageUtil.toByteBuf(new SmallMessage(TransferMessageType.REGISTER, SmallMessage.Response.bad("解析客户端属性失败"))));
+                    return;
+                }
+                if (StrUtil.isBlank(clientInfo.getDataId())) {
+                    ctx.writeAndFlush(MessageUtil.toByteBuf(new SmallMessage(TransferMessageType.REGISTER, SmallMessage.Response.bad("解析客户端属性失败"))));
+                    return;
+                }
+                ConfigClientManage.register(clientInfo.getEnv(), clientInfo.getDataId(), ctx);
+                ctx.writeAndFlush(MessageUtil.toByteBuf(new SmallMessage(TransferMessageType.REGISTER, SmallMessage.Response.ok(null))));
+                break;
+            case PULL_CONFIG:
+                if (!resp.getSuccess()) {
+                    System.err.println("ServerHandler -> 客户端说它没有准备好拉取配置");
+                    return;
+                }
+                System.err.println("ServerHandler -> 客户端说它准备好拉取配置了");
+                String[] envDataId = ConfigClientManage.getEnvDataId(ctx.channel().id());
+                String env = envDataId[0];
+                String dataId = envDataId[1];
+                List<ConfigFileInfo> fileList = configFileService.getFileList(env, dataId);
+                if (fileList.isEmpty()) {
+                    ctx.writeAndFlush(MessageUtil.toByteBuf(new SmallMessage(TransferMessageType.PUSH_CONFIG, SmallMessage.Response.bad(
+                            String.format("应用 %s 没有环境编码为 %s 的配置", dataId, env)
+                    ))));
+                } else {
+                    System.err.println("ServerHandler -> 推送配置到客户端");
+                    ctx.writeAndFlush(MessageUtil.toByteBuf(new SmallMessage(TransferMessageType.PUSH_CONFIG, SmallMessage.Response.ok(fileList))));
+                }
+                break;
+            default:
+                break;
         }
     }
 
