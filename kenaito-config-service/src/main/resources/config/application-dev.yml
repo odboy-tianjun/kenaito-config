@@ -1,5 +1,5 @@
 server:
-  port: 28000
+  port: 28010
   http2:
     # 提高网络传输效率, 默认为false
     enabled: true
@@ -219,8 +219,9 @@ file:
     path: /home/kenaito/file/
     avatar: /home/kenaito/avatar/
   windows:
-    path: C:\kenaito\file\
-    avatar: C:\kenaito\avatar\
+    # 一定不要用’\‘符号, 会导致一系列的BUG
+    path: C:/kenaito/file/
+    avatar: C:/kenaito/avatar/
   # 文件大小 /M
   maxSize: 100
   avatarMaxSize: 5
@@ -248,4 +249,4 @@ task:
     queue-capacity: 50
 kenaito:
   config-center:
-    port: 28002
+    port: 28011

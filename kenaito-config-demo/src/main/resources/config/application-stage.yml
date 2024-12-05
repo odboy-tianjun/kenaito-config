@@ -1,7 +1,7 @@
 kenaito:
   config-center:
     server: 127.0.0.1
-    port: 28002
+    port: 28011
     data-id: kenaito-config-demo
     cache-dir: /home/admin/data
     env: stage

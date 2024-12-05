@@ -1,5 +1,6 @@
 package cn.odboy.config.netty;
 
+import cn.odboy.config.context.ClientConfigLoader;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -50,7 +51,7 @@ public class ConfigClient {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline pipeline = ch.pipeline();
-                            pipeline.addLast(new ConfigClientHandler(ConfigClient.this));
+                            pipeline.addLast(new ConfigClientHandler());
                         }
                     });
             doConnect(server, port);
@@ -101,6 +102,7 @@ public class ConfigClient {
     protected void reConnect() {
         try {
             System.err.println("ConfigClient -> Start reconnect to server." + this.connectServerIp + ":" + this.connectServerPort);
+            ClientConfigLoader.isConfigLoaded = false;
             if (channel != null && channel.isOpen()) {
                 System.err.println("ConfigClient -> Server [" + this.connectServerIp + "] channel is active, close it and reconnect");
                 channel.close();

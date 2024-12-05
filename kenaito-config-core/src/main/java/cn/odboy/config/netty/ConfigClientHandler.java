@@ -19,11 +19,6 @@ import java.util.Map;
 import java.util.Properties;
 
 public class ConfigClientHandler extends ChannelInboundHandlerAdapter {
-    private final ConfigClient configClient;
-
-    public ConfigClientHandler(ConfigClient configClient) {
-        this.configClient = configClient;
-    }
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {

@@ -50,7 +50,7 @@ public class ConfigNettyServer implements InitializingBean {
                             pipeline.addLast(new ConfigServerHandler(configFileService));
                         }
                     });
-            log.info("Netty Server Start...");
+            log.info("Netty Server Start..., Port=" + configCenterPort);
             ChannelFuture channelFuture = serverBootstrap.bind(configCenterPort).sync();
             channelFuture.channel().closeFuture().sync();
         } finally {

@@ -1,6 +1,7 @@
 package cn.odboy.config.context;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.odboy.config.model.msgtype.ClientInfo;
 import cn.odboy.config.netty.ConfigClient;
 import lombok.extern.slf4j.Slf4j;
@@ -13,10 +14,13 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,7 +37,7 @@ public class ClientConfigLoader {
     private static final String DEFAULT_PATH_WIN = "c:\\data";
     private static final String DEFAULT_PATH_MAC = "/home/admin/data";
     private static final String DEFAULT_CONFIG_SERVER = "127.0.0.1";
-    private static final Integer DEFAULT_CONFIG_PORT = 28002;
+    private static final Integer DEFAULT_CONFIG_PORT = 28010;
     private static final String DEFAULT_CONFIG_ENV = "default";
     private static final String DEFAULT_CONFIG_DATA_ID = "default";
     private static final String DEFAULT_PATH_WIN_SEP = ":";
@@ -77,6 +81,23 @@ public class ClientConfigLoader {
                 log.info("客户端属性: {}", clientInfo);
                 validateCacheDirPath(defaultCacheDir, clientInfo.getCacheDir());
                 createCacheDir(clientInfo.getCacheDir());
+                ThreadUtil.execAsync(() -> {
+                    // 定时刷盘
+                    while (true) {
+                        try {
+                            if (!lastConfigs.isEmpty()) {
+                                List<String> fileContent = new ArrayList<>();
+                                for (Map.Entry<String, Object> kve : lastConfigs.entrySet()) {
+                                    fileContent.add(kve.getKey() + "=" + kve.getValue());
+                                }
+                                FileUtil.writeLines(fileContent, FileUtil.file(clientInfo.getCacheDir(), "config"), StandardCharsets.UTF_8);
+                            }
+                            Thread.sleep(5 * 1000);
+                        } catch (Exception e) {
+                            // 忽略
+                        }
+                    }
+                });
                 try {
                     ConfigClient client = new ConfigClient();
                     client.start(clientInfo.getServer(), clientInfo.getPort());
