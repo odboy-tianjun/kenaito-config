@@ -109,7 +109,7 @@ public class ConfigServerHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-    log.error("当Channel发生异常被调用", cause);
+    log.error("Channel发生异常", cause);
     /// cause.printStackTrace();
     ConfigClientManage.unregister(ctx.channel().id());
     ctx.close();
@@ -117,13 +117,13 @@ public class ConfigServerHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-    log.info("当Channel处于非活动状态（已经连接到它的远程节点）时被调用");
+    /// log.info("当Channel处于非活动状态（已经连接到它的远程节点）时被调用");
     ConfigClientManage.unregister(ctx.channel().id());
   }
 
   @Override
   public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-    log.info("当Channel从它的EventLoop注销并且不能够处理I/O时被调用");
+    /// log.info("当Channel从它的EventLoop注销并且不能够处理I/O时被调用");
     ConfigClientManage.unregister(ctx.channel().id());
   }
 }
