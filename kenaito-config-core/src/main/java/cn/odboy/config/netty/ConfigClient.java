@@ -43,7 +43,7 @@ public class ConfigClient {
   private static volatile ConfigClient instance;
 
   /** 最大重试次数 */
-  private static final int MAX_RETRY_COUNT = 2;
+  private static final int MAX_RETRY_COUNT = 5;
 
   /** 当前重试次数 */
   private static int retryCount = 0;
@@ -90,7 +90,7 @@ public class ConfigClient {
   }
 
   private void doConnect(String server, Integer port) throws InterruptedException {
-    logger.info("ConfigClient -> Start");
+    logger.info("开始连接配置中心服务...");
     if (channel != null && channel.isActive()) {
       return;
     }
@@ -107,11 +107,11 @@ public class ConfigClient {
         channel = channelFuture.channel();
         // 重置重试次数
         retryCount = 0;
-        logger.info("ConfigClient -> Connect success {}:{}", serverIp, serverPort);
+        logger.info("连接成功 {}:{}", serverIp, serverPort);
       } else {
         // 失败后delaySecond秒（默认是5秒）重连，周期性delaySecond秒的重连
         retryCount++;
-        logger.info("ConfigClient -> 当前重试次数: {}", retryCount);
+        logger.info("当前重试次数: {}", retryCount);
         if (retryCount >= MAX_RETRY_COUNT) {
           ClientConfigLoader.isConfigLoaded = true;
           ClientConfigLoader.isServerOffline = true;
@@ -133,13 +133,11 @@ public class ConfigClient {
   /** 重新连接 */
   protected void reConnect() {
     try {
-      logger.info(
-          "ConfigClient -> Start reconnect to server.{}:{}", this.serverIp, this.serverPort);
+      logger.info("重连配置中心服务 {}:{}", this.serverIp, this.serverPort);
       ClientConfigLoader.isConfigLoaded = false;
       ClientConfigLoader.isServerOffline = false;
       if (channel != null && channel.isOpen()) {
-        logger.info(
-            "ConfigClient -> Server [{}] channel is active, close it and reconnect", this.serverIp);
+        logger.info("Channel已激活, 关闭且重启中...");
         channel.close();
       }
       bootstrap
@@ -148,11 +146,7 @@ public class ConfigClient {
           .sync()
           .channel();
     } catch (Exception e) {
-      logger.error(
-          "ConfigClient -> ReConnect to server failure. server={}:{}:{}",
-          this.serverIp,
-          this.serverPort,
-          e.getMessage());
+      logger.error("重连配置中心服务失败 {}:{}", this.serverIp, this.serverPort, e);
     }
   }
 }

@@ -29,17 +29,17 @@ public class ConfigClientHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-    logger.info("ConfigClientHandler -> 当Channel已经注册到它的EventLoop并且能够处理I/O时被调用");
+    logger.info("当Channel已经注册到它的EventLoop并且能够处理I/O时被调用");
   }
 
   @Override
   public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-    logger.info("ConfigClientHandler -> 当Channel从它的EventLoop注销并且无法处理任何I/O时被调用");
+    logger.info("当Channel从它的EventLoop注销并且无法处理任何I/O时被调用");
   }
 
   @Override
   public void channelActive(ChannelHandlerContext ctx) throws Exception {
-    logger.info("ConfigClientHandler -> 当Channel处于活动状态（已经连接到它的远程节点）时被调用, 注册客户端");
+    logger.info("当Channel处于活动状态（已经连接到它的远程节点）时被调用, 注册客户端");
     SmallMessage smallMessage = new SmallMessage();
     smallMessage.setType(TransferMessageType.REGISTER);
     smallMessage.setResp(SmallMessage.Response.ok(ClientConfigLoader.clientInfo));
@@ -48,22 +48,22 @@ public class ConfigClientHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-    logger.info("ConfigClientHandler -> 当Channel离开活动状态并且不再连接到它的远程节点时被调用");
+    logger.info("当Channel离开活动状态并且不再连接到它的远程节点时被调用");
     /// this.configClient.reConnect();
   }
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-    /// logger.info("ConfigClientHandler -> 当从Channel读取数据时被调用, 收到服务器消息");
-    logger.info("ConfigClientHandler -> 从服务端读取到Object");
+    /// logger.info("当从Channel读取数据时被调用, 收到服务器消息");
+    logger.info("从服务端读取到Object");
     SmallMessage smallMessage = MessageUtil.getMessage(msg);
     SmallMessage.Response resp = smallMessage.getResp();
     switch (smallMessage.getType()) {
       case REGISTER:
         if (!resp.getSuccess()) {
-          logger.info("ConfigClientHandler -> 注册失败, {}", resp.getErrorMessage());
+          logger.info("注册失败, {}", resp.getErrorMessage());
         } else {
-          logger.info("ConfigClientHandler -> 注册成功, 给服务端发信号, 表明准备好可以拉取配置了");
+          logger.info("注册成功, 给服务端发信号, 表明准备好可以拉取配置了");
           // 准备拉取配置，给服务端发信号
           SmallMessage pullConfigMessage = new SmallMessage();
           pullConfigMessage.setType(TransferMessageType.PULL_CONFIG);
@@ -76,7 +76,7 @@ public class ConfigClientHandler extends ChannelInboundHandlerAdapter {
           throw new RuntimeException(resp.getErrorMessage());
         }
         List<ConfigFileInfo> configFileInfos = MessageUtil.toConfigFileInfoList(resp.getData());
-        logger.info("ConfigClientHandler -> 收到来自服务端推送的配置信息");
+        logger.info("收到来自服务端推送的配置信息");
         Map<String, String> originConfigs = new HashMap<>(1);
         Map<String, Map<String, Object>> lastConfigs = new HashMap<>(1);
         try {
@@ -101,7 +101,7 @@ public class ConfigClientHandler extends ChannelInboundHandlerAdapter {
               lastConfigs.put(fileName, tempMap);
             }
           }
-          logger.info("ConfigClientHandler -> 配置文件转map成功");
+          logger.info("配置文件转map成功");
           ClientConfigLoader.originConfigs = originConfigs;
           ClientConfigLoader.lastConfigs = lastConfigs;
           ClientConfigLoader.isConfigLoaded = true;
@@ -110,7 +110,7 @@ public class ConfigClientHandler extends ChannelInboundHandlerAdapter {
             ClientConfigLoader.clientInfo.notifyAll();
           }
         } catch (IOException e) {
-          logger.info("ConfigClientHandler -> 配置文件转map失败", e);
+          logger.info("配置文件转map失败", e);
         }
         break;
       default:

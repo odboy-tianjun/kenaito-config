@@ -29,9 +29,9 @@ public class ConfigServerHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-    /// log.info("ServerHandler -> 当从Channel读取数据时被调用");
+    /// log.info("当从Channel读取数据时被调用");
     SmallMessage smallMessage = MessageUtil.getMessage(msg);
-    log.info("ServerHandler -> 从客户端读取到Object：{}", smallMessage);
+    log.info("从客户端读取到Object：{}", smallMessage);
     SmallMessage.Response resp = smallMessage.getResp();
     switch (smallMessage.getType()) {
       case REGISTER:
@@ -53,16 +53,16 @@ public class ConfigServerHandler extends ChannelInboundHandlerAdapter {
         break;
       case PULL_CONFIG:
         if (!resp.getSuccess()) {
-          log.info("ServerHandler -> 客户端说它没有准备好拉取配置");
+          log.info("客户端说它没有准备好拉取配置");
           break;
         }
-        log.info("ServerHandler -> 客户端说它准备好拉取配置了");
+        log.info("客户端说它准备好拉取配置了");
         String[] envDataId = ConfigClientManage.getEnvDataId(ctx.channel().id());
         String env = envDataId[0];
         String dataId = envDataId[1];
         List<Channel> channels = ConfigClientManage.queryChannels(env, dataId);
         if (channels.isEmpty()) {
-          log.info("ServerHandler -> 没有在线的客户端");
+          log.info("没有在线的客户端");
           break;
         }
         List<ConfigFileInfo> fileList = configFileService.getFileList(env, dataId);
@@ -74,7 +74,7 @@ public class ConfigServerHandler extends ChannelInboundHandlerAdapter {
                   MessageUtil.toPushConfigBad(String.format("应用 %s 没有环境编码为 %s 的配置", dataId, env)));
             } catch (Exception e) {
               log.error(
-                  "ServerHandler -> 推送无法获取配置的消息到客户端失败, env: {}, dataId={}, channelId={}",
+                  "推送无法获取配置的消息到客户端失败, env: {}, dataId={}, channelId={}",
                   env,
                   dataId,
                   ChannelUtil.getId(channel.id()),
@@ -87,13 +87,13 @@ public class ConfigServerHandler extends ChannelInboundHandlerAdapter {
             try {
               ctx.writeAndFlush(MessageUtil.toPushConfigOk(fileList));
               log.info(
-                  "ServerHandler -> 推送配置到客户端成功, env: {}, dataId={}, channelId={}",
+                  "推送配置到客户端成功, env: {}, dataId={}, channelId={}",
                   env,
                   dataId,
                   ChannelUtil.getId(channel.id()));
             } catch (Exception e) {
               log.error(
-                  "ServerHandler -> 推送配置到客户端失败, env: {}, dataId={}, channelId={}",
+                  "推送配置到客户端失败, env: {}, dataId={}, channelId={}",
                   env,
                   dataId,
                   ChannelUtil.getId(channel.id()),
@@ -109,7 +109,7 @@ public class ConfigServerHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-    log.error("ServerHandler -> 当Channel发生异常被调用", cause);
+    log.error("当Channel发生异常被调用", cause);
     /// cause.printStackTrace();
     ConfigClientManage.unregister(ctx.channel().id());
     ctx.close();
@@ -117,13 +117,13 @@ public class ConfigServerHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-    log.info("ServerHandler -> 当Channel处于非活动状态（已经连接到它的远程节点）时被调用");
+    log.info("当Channel处于非活动状态（已经连接到它的远程节点）时被调用");
     ConfigClientManage.unregister(ctx.channel().id());
   }
 
   @Override
   public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-    log.info("ServerHandler -> 当Channel从它的EventLoop注销并且不能够处理I/O时被调用");
+    log.info("当Channel从它的EventLoop注销并且不能够处理I/O时被调用");
     ConfigClientManage.unregister(ctx.channel().id());
   }
 }

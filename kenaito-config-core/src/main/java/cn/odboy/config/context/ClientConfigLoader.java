@@ -121,7 +121,7 @@ public class ClientConfigLoader {
                         StandardCharsets.UTF_8);
                   } catch (Exception e) {
                     logger.error(
-                        "ClientConfigLoader -> 应用 {},环境 {},缓存配置文件 {} 失败",
+                        "应用 {},环境 {},缓存配置文件 {} 失败",
                         clientInfo.getDataId(),
                         clientInfo.getEnv(),
                         kve.getKey(),
@@ -141,7 +141,7 @@ public class ClientConfigLoader {
           throws BeansException {
         String defaultCacheDir = getDefaultCacheDir();
         initClientInfo(defaultCacheDir, environment);
-        logger.info("ClientConfigLoader -> 客户端属性: {}", clientInfo);
+        logger.info("客户端属性: {}", clientInfo);
         validateCacheDirPath(defaultCacheDir, clientInfo.getCacheDir());
         createCacheDir(clientInfo.getCacheDir());
         fixedTimeFlushConfigFileThread.start();
@@ -150,7 +150,7 @@ public class ClientConfigLoader {
               try {
                 ConfigClient.getInstance().start(clientInfo.getServer(), clientInfo.getPort());
               } catch (InterruptedException e) {
-                logger.error("ClientConfigLoader -> Netty客户端启动失败", e);
+                logger.error("Netty客户端启动失败", e);
                 throw new RuntimeException(e);
               }
             });
@@ -164,12 +164,12 @@ public class ClientConfigLoader {
               Thread currentThread = Thread.currentThread();
               String currentThreadName = currentThread.getName();
               currentThread.interrupt();
-              logger.error("ClientConfigLoader -> 中断线程: {}", currentThreadName, e);
+              logger.error("中断线程: {}", currentThreadName, e);
             }
           }
           // 判断配置中心服务是否处于离线状态
           if (isServerOffline) {
-            logger.info("ClientConfigLoader -> 配置中心离线，尝试从本地缓存加载配置文件");
+            logger.info("配置中心离线，尝试从本地缓存加载配置文件");
             String cacheDir = clientInfo.getCacheDir();
             FileUtil.walkFiles(
                 FileUtil.file(cacheDir),
@@ -197,7 +197,7 @@ public class ClientConfigLoader {
                       lastConfigs.put(fileName, tempMap);
                     }
                   } catch (Exception e) {
-                    logger.info("ClientConfigLoader -> 配置文件转map失败", e);
+                    logger.info("配置文件转map失败", e);
                   }
                 }));
           }

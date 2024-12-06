@@ -56,7 +56,7 @@ public class ConfigClientManage {
   public static void register(String env, String dataId, ChannelHandlerContext ctx) {
     String envClientKey = String.format("%s_%s_%s", env, dataId, ChannelUtil.getId(ctx));
     CLIENT.put(envClientKey, ctx.channel());
-    log.info("ConfigClientManage -> 客户端 {} 注册成功", envClientKey);
+    log.info("客户端 {} 注册成功", envClientKey);
   }
 
   /**
@@ -76,7 +76,7 @@ public class ConfigClientManage {
           channel.closeFuture();
         }
         CLIENT.remove(envClientKey);
-        log.info("ConfigClientManage -> 客户端 {} 注销成功", envClientKey);
+        log.info("客户端 {} 注销成功", envClientKey);
       }
     }
   }
