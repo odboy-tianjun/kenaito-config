@@ -1,6 +1,6 @@
 package cn.odboy.modules.system.domain;
 
-import cn.odboy.base.MyEntity;
+import cn.odboy.base.MyNormalEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -17,7 +17,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @TableName("system_dict_detail")
-public class DictDetail extends MyEntity implements Serializable {
+public class DictDetail extends MyNormalEntity implements Serializable {
 
     @NotNull(groups = Update.class)
     @TableId(value = "detail_id", type = IdType.AUTO)

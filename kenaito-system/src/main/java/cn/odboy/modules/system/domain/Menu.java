@@ -1,6 +1,6 @@
 package cn.odboy.modules.system.domain;
 
-import cn.odboy.base.MyEntity;
+import cn.odboy.base.MyNormalEntity;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
@@ -18,7 +18,7 @@ import java.util.Set;
 @Getter
 @Setter
 @TableName("system_menu")
-public class Menu extends MyEntity implements Serializable {
+public class Menu extends MyNormalEntity implements Serializable {
 
     @NotNull(groups = {Update.class})
     @TableId(value = "menu_id", type = IdType.AUTO)

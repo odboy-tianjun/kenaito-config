@@ -1,6 +1,6 @@
 package cn.odboy.modules.system.domain;
 
-import cn.odboy.base.MyEntity;
+import cn.odboy.base.MyNormalEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -18,7 +18,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @TableName("system_job")
-public class Job extends MyEntity implements Serializable {
+public class Job extends MyNormalEntity implements Serializable {
 
     @NotNull(groups = Update.class)
     @TableId(value = "job_id", type = IdType.AUTO)

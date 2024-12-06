@@ -1,6 +1,6 @@
 package cn.odboy.modules.system.domain;
 
-import cn.odboy.base.MyEntity;
+import cn.odboy.base.MyNormalEntity;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -22,7 +22,7 @@ import java.util.Set;
 @Getter
 @Setter
 @TableName("system_dept")
-public class Dept extends MyEntity implements Serializable {
+public class Dept extends MyNormalEntity implements Serializable {
 
     @NotNull(groups = Update.class)
     @TableId(value = "dept_id", type = IdType.AUTO)
