@@ -10,6 +10,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 
+/**
+ * 加载并处理@Value对应的引用
+ *
+ * @author odboy
+ * @date 2024-12-07
+ */
 @Component
 public class ValueAnnotationBeanPostProcessor implements BeanPostProcessor {
   private final Logger logger = LoggerFactory.getLogger(ValueAnnotationBeanPostProcessor.class);
@@ -55,9 +61,5 @@ public class ValueAnnotationBeanPostProcessor implements BeanPostProcessor {
     } catch (IllegalAccessException e) {
       logger.error("配置 {} 字段值 {} 失败", propertyName, value, e);
     }
-  }
-
-  public Map<String, Field> getNameFieldMap() {
-    return nameFieldMap;
   }
 }
