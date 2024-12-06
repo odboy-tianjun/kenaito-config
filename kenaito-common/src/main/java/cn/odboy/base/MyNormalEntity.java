@@ -18,7 +18,7 @@ import java.util.Date;
  */
 @Getter
 @Setter
-public class MyEntity extends MyObject {
+public class MyNormalEntity extends MyObject {
 
     /**
      * 创建人

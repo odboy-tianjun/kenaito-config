@@ -1,6 +1,6 @@
 package cn.odboy.util;
 
-import cn.odboy.base.MyEntity;
+import cn.odboy.base.MyNormalEntity;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,9 +27,9 @@ public class ListUtil {
     // list转map，保留旧值 -> Map<String, User> userMap = users.stream().collect(Collectors.toMap(User::getName, user -> user, (existing, replacement) -> existing));
 
     public static void main(String[] args) {
-        List<MyEntity> entities = new ArrayList<>();
+        List<MyNormalEntity> entities = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
-            MyEntity entity = new MyEntity();
+            MyNormalEntity entity = new MyNormalEntity();
             if (i % 2 == 0) {
                 entity.setCreateBy("odboy");
             } else {
@@ -40,7 +40,7 @@ public class ListUtil {
             entity.setUpdateTime(new Date());
             entities.add(entity);
         }
-        List<MyEntity> entities1 = ListUtil.distinctByTArgs(entities, MyEntity::getCreateBy);
+        List<MyNormalEntity> entities1 = ListUtil.distinctByTArgs(entities, MyNormalEntity::getCreateBy);
         System.err.println(entities1);
     }
 }

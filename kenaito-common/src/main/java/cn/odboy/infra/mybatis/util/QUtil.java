@@ -5,7 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.odboy.base.MyEntity;
+import cn.odboy.base.MyNormalEntity;
 import cn.odboy.constant.SystemConst;
 import cn.odboy.infra.context.SecurityUtil;
 import cn.odboy.infra.exception.BadRequestException;
@@ -240,7 +240,7 @@ public class QUtil {
 
     @TableName("test_domain")
     private static class TestDomain {
-        @NotNull(groups = MyEntity.Update.class)
+        @NotNull(groups = MyNormalEntity.Update.class)
         @TableId(value = "user_id", type = IdType.AUTO)
         private Long id;
         @TableField(value = "dept_id")
