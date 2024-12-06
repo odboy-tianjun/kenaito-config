@@ -43,7 +43,7 @@ public class ConfigClient {
   private static volatile ConfigClient instance;
 
   /** 最大重试次数 */
-  private static final int MAX_RETRY_COUNT = 5;
+  private static final int MAX_RETRY_COUNT = 2;
 
   /** 当前重试次数 */
   private static int retryCount = 0;
