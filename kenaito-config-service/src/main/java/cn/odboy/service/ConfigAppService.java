@@ -14,4 +14,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ConfigAppService extends IService<ConfigApp> {
 
+    void create(ConfigApp.CreateArgs args);
+
+    void remove(ConfigApp.RemoveArgs args);
+
+    void modifyDescription(ConfigApp.ModifyDescriptionArgs args);
 }

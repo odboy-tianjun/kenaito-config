@@ -2,12 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.odboy.mapper.ConfigFileMapper">
     <select id="selectByEnvAndAppName" resultType="cn.odboy.config.model.msgtype.ConfigFileInfo">
-        SELECT t1.file_name,
-               t2.file_content
-        FROM config_file t1
-                 LEFT JOIN config_version t2 ON t1.id = t2.file_id
-            AND t1.version = t2.version
-        WHERE t1.env = #{env}
+        SELECT t2.file_name,
+               t3.file_content
+        FROM config_app t1
+                 LEFT JOIN config_file t2 ON t1.id = t2.app_id
+                 LEFT JOIN config_version t3 ON t1.id = t3.file_id
+            AND t2.version = t3.version
+        WHERE t2.env = #{env}
           AND t1.app_name = #{dataId}
     </select>
 </mapper>
