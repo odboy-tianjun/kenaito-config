@@ -21,23 +21,23 @@ public class SmallMessage implements Serializable {
     public static class Response implements Serializable {
         private Boolean success = true;
         private String errorCode = "0";
-        private String errorMsg = "success";
+        private String errorMessage = "success";
         private Object data;
 
-        public static Response bad(String errorMsg) {
+        public static Response bad(String errorMessage) {
             Response response = new Response();
             response.setSuccess(false);
             response.setErrorCode("400");
-            response.setErrorMsg(errorMsg);
+            response.setErrorMessage(errorMessage);
             response.setData(null);
             return response;
         }
 
-        public static Response ok(Object data, String errorMsg) {
+        public static Response ok(Object data, String errorMessage) {
             Response response = new Response();
             response.setSuccess(true);
             response.setErrorCode("0");
-            response.setErrorMsg(errorMsg);
+            response.setErrorMessage(errorMessage);
             response.setData(data);
             return response;
         }
@@ -46,7 +46,7 @@ public class SmallMessage implements Serializable {
             Response response = new Response();
             response.setSuccess(true);
             response.setErrorCode("0");
-            response.setErrorMsg("success");
+            response.setErrorMessage("success");
             response.setData(data);
             return response;
         }

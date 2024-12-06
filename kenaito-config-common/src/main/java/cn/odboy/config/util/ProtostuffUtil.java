@@ -14,15 +14,15 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ProtostuffUtil {
 
-    private static Map<Class<?>, Schema<?>> cachedSchema = new ConcurrentHashMap<Class<?>, Schema<?>>();
+    private static final Map<Class<?>, Schema<?>> CACHED_SCHEMA = new ConcurrentHashMap<Class<?>, Schema<?>>();
 
     private static <T> Schema<T> getSchema(Class<T> clazz) {
         @SuppressWarnings("unchecked")
-        Schema<T> schema = (Schema<T>) cachedSchema.get(clazz);
+        Schema<T> schema = (Schema<T>) CACHED_SCHEMA.get(clazz);
         if (schema == null) {
             schema = RuntimeSchema.getSchema(clazz);
             if (schema != null) {
-                cachedSchema.put(clazz, schema);
+                CACHED_SCHEMA.put(clazz, schema);
             }
         }
         return schema;
@@ -30,9 +30,6 @@ public class ProtostuffUtil {
 
     /**
      * 序列化
-     *
-     * @param obj
-     * @return
      */
     public static <T> byte[] serializer(T obj) {
         @SuppressWarnings("unchecked")
@@ -50,10 +47,6 @@ public class ProtostuffUtil {
 
     /**
      * 反序列化
-     *
-     * @param data
-     * @param clazz
-     * @return
      */
     public static <T> T deserializer(byte[] data, Class<T> clazz) {
         try {
