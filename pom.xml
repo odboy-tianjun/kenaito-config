@@ -143,24 +143,6 @@
             <version>2.9.0</version>
         </dependency>
 
-        <!-- Spring boot 安全框架 -->
-        <!-- fix: org.springframework.security:spring-security-core:5.7.11 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.security</groupId>
-                    <artifactId>spring-security-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-            <version>5.8.12</version>
-        </dependency>
-
         <!-- Spring boot AOP（druid spring监控支持） -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
