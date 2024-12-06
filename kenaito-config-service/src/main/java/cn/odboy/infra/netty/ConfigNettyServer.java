@@ -16,46 +16,57 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * 配置中心服务
+ *
+ * @author odboy
+ * @date 2024-12-06
+ */
 @Slf4j
 @Component
 public class ConfigNettyServer implements InitializingBean {
-    @Value("${kenaito.config-center.port}")
-    private Integer configCenterPort;
-    @Autowired
-    private ConfigFileService configFileService;
+  @Value("${kenaito.config-center.port}")
+  private Integer configCenterPort;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        ThreadUtil.execAsync(() -> {
-            try {
-                start();
-            } catch (InterruptedException e) {
-                log.error("Netty Server Start Error", e);
-                throw new RuntimeException(e);
-            }
+  @Autowired private ConfigFileService configFileService;
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    ThreadUtil.execAsync(
+        () -> {
+          try {
+            start();
+          } catch (InterruptedException e) {
+            log.error("Netty服务端启动失败", e);
+            throw new RuntimeException(e);
+          }
         });
-    }
+  }
 
-    public void start() throws InterruptedException {
-        EventLoopGroup bossGroup = new NioEventLoopGroup(2);
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
-        try {
-            ServerBootstrap serverBootstrap = new ServerBootstrap();
-            serverBootstrap.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            ChannelPipeline pipeline = ch.pipeline();
-                            pipeline.addLast(new ConfigServerHandler(configFileService));
-                        }
-                    });
-            log.info("Netty Server Start..., Port=" + configCenterPort);
-            ChannelFuture channelFuture = serverBootstrap.bind(configCenterPort).sync();
-            channelFuture.channel().closeFuture().sync();
-        } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-        }
+  public void start() throws InterruptedException {
+    // 这里为什么是16捏，好问题，我之前搞dingtalk二开的时候，看到有个地方的线程默认值就是16。
+    // 写配置项也可以，爱怎么改怎么改好吧，但是请记得MIT协议内容~
+    EventLoopGroup bossGroup = new NioEventLoopGroup(16);
+    EventLoopGroup workerGroup = new NioEventLoopGroup();
+    try {
+      ServerBootstrap serverBootstrap = new ServerBootstrap();
+      serverBootstrap
+          .group(bossGroup, workerGroup)
+          .channel(NioServerSocketChannel.class)
+          .childHandler(
+              new ChannelInitializer<SocketChannel>() {
+                @Override
+                protected void initChannel(SocketChannel ch) throws Exception {
+                  ChannelPipeline pipeline = ch.pipeline();
+                  pipeline.addLast(new ConfigServerHandler(configFileService));
+                }
+              });
+      log.info("Netty服务端启动中, 监听端口={}", configCenterPort);
+      ChannelFuture channelFuture = serverBootstrap.bind(configCenterPort).sync();
+      channelFuture.channel().closeFuture().sync();
+    } finally {
+      bossGroup.shutdownGracefully();
+      workerGroup.shutdownGracefully();
     }
+  }
 }
