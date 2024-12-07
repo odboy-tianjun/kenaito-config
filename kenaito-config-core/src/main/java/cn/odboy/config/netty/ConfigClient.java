@@ -60,7 +60,7 @@ public class ConfigClient {
     /**
      * 最大重试次数
      */
-    private static final int MAX_RETRY_COUNT = 2;
+    private static final int MAX_RETRY_COUNT = 5;
 
     /**
      * 当前重试次数
