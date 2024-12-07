@@ -11,39 +11,37 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 
 /**
- * 加载并处理@Value对应的引用
+ * 加载并处理@Value对应的引用, @ConfigurationProperties注解下的值会自动刷新所以不用管
  *
  * @author odboy
  * @date 2024-12-07
  */
 @Component
-public class ValueAnnotationBeanPostProcessor implements BeanPostProcessor {
-  private final Logger logger = LoggerFactory.getLogger(ValueAnnotationBeanPostProcessor.class);
-  private final Map<String, Field> nameFieldMap = new HashMap<>();
-  private final Map<String, Object> nameBeanMap = new HashMap<>();
+public class ValueAnnotationProcessor implements BeanPostProcessor {
+  private final Logger logger = LoggerFactory.getLogger(ValueAnnotationProcessor.class);
+  private final Map<String, Field> valueFieldMap = new HashMap<>();
+  private final Map<String, Object> valueBeanMap = new HashMap<>();
 
   @Override
   public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
     Class<?> clazz = bean.getClass();
     while (clazz != null) {
+      // 处理@Value
       for (Field field : clazz.getDeclaredFields()) {
         if (field.isAnnotationPresent(Value.class)) {
           field.setAccessible(true);
           // 对@Value的处理
           Value annotation = field.getAnnotation(Value.class);
           String propertyName = annotation.value();
-          String substring =
+          propertyName =
               propertyName.substring(propertyName.indexOf("${") + 2, propertyName.lastIndexOf("}"));
           // 处理带有默认值的配置
-          propertyName = substring;
-          if (substring.contains(":")) {
-            String[] splits = substring.split(":");
-            if (splits.length == 2) {
-              propertyName = splits[0];
-            }
+          if (propertyName.contains(":")) {
+            int firstSpIndex = propertyName.indexOf(":");
+            propertyName = propertyName.substring(0, firstSpIndex);
           }
-          nameFieldMap.put(propertyName, field);
-          nameBeanMap.put(propertyName, bean);
+          valueFieldMap.put(propertyName, field);
+          valueBeanMap.put(propertyName, bean);
         }
       }
       clazz = clazz.getSuperclass();
@@ -53,13 +51,13 @@ public class ValueAnnotationBeanPostProcessor implements BeanPostProcessor {
 
   public void setValue(String propertyName, Object value) {
     try {
-      Field field = nameFieldMap.getOrDefault(propertyName, null);
+      Field field = valueFieldMap.getOrDefault(propertyName, null);
       if (field != null) {
         field.setAccessible(true);
-        field.set(nameBeanMap.get(propertyName), value);
+        field.set(valueBeanMap.get(propertyName), value);
       }
     } catch (IllegalAccessException e) {
-      logger.error("配置 {} 字段值 {} 失败", propertyName, value, e);
+      logger.error("设置 {} 字段值 {} 失败", propertyName, value, e);
     }
   }
 }

@@ -1,7 +1,7 @@
 package cn.odboy.rest;
 
-import cn.odboy.config.context.ValueAnnotationBeanPostProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
+import cn.odboy.config.context.ClientPropertyHelper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,19 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/updateConfig")
+@RequiredArgsConstructor
 public class DemoController {
-  @Value("${kenaito.config-center.demo:123}")
-  private String demoStr;
+  @Value("${kenaito.config-center.test}")
+  private String testStr;
 
-  @Autowired private ValueAnnotationBeanPostProcessor valueAnnotationBeanPostProcessor;
+  private final ClientPropertyHelper clientPropertyHelper;
 
   /** 配置变化了 */
   @GetMapping("/test")
   public ResponseEntity<Object> test() {
-    System.err.println("demoStr=" + demoStr);
-    String propertyName = "kenaito.config-center.demo";
-    valueAnnotationBeanPostProcessor.setValue(propertyName, "xxxxxxxxxx");
-    System.err.println("demoStr=" + demoStr);
+    System.err.println("testStr=" + testStr);
+    String propertyName = "kenaito.config-center.test";
+    clientPropertyHelper.updateValue(propertyName, "Hello World");
+    System.err.println("testStr=" + testStr);
     return ResponseEntity.ok("success");
   }
 }

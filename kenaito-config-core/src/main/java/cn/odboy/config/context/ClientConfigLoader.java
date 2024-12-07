@@ -5,7 +5,6 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.odboy.config.model.msgtype.ClientInfo;
 import cn.odboy.config.netty.ConfigClient;
-import cn.odboy.config.util.PropertyNameUtil;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -69,6 +68,9 @@ public class ClientConfigLoader {
   /** Mac路径分割符 */
   private static final String DEFAULT_PATH_SEP_MAC = "/";
 
+  /** 配置源名称 */
+  public static final String PROPERTY_SOURCE_NAME = "kenaito-dynamic-config";
+
   /** 当前客户端配置 */
   public static final ClientInfo clientInfo = new ClientInfo();
 
@@ -83,6 +85,9 @@ public class ClientConfigLoader {
 
   /** 转换后的配置信息：filename -> {configKey: configValue} */
   public static Map<String, Map<String, Object>> lastConfigs = new HashMap<>();
+
+  /** 所有自定义配置项缓存 */
+  public static Map<String, Object> cacheConfigs = new HashMap<>();
 
   /** 定时将配置写盘，缓存配置信息 */
   private final Thread fixedTimeFlushConfigFileThread =
@@ -201,13 +206,15 @@ public class ClientConfigLoader {
                   }
                 }));
           }
+          // 合并配置项
+          cacheConfigs.clear();
           Set<Map.Entry<String, Map<String, Object>>> filename2ConfigMap = lastConfigs.entrySet();
           for (Map.Entry<String, Map<String, Object>> filename2Config : filename2ConfigMap) {
-            MapPropertySource propertySource =
-                new MapPropertySource(
-                    PropertyNameUtil.get(filename2Config.getKey()), filename2Config.getValue());
-            environment.getPropertySources().addFirst(propertySource);
+            cacheConfigs.putAll(filename2Config.getValue());
           }
+          MapPropertySource propertySource =
+              new MapPropertySource(PROPERTY_SOURCE_NAME, cacheConfigs);
+          environment.getPropertySources().addFirst(propertySource);
         }
       }
     };
