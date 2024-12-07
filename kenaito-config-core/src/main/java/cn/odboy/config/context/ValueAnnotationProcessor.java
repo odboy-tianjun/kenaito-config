@@ -11,7 +11,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 
 /**
- * 加载并处理@Value对应的引用, @ConfigurationProperties注解下的值会自动刷新所以不用管
+ * 加载并处理@Value对应的引用
  *
  * @author odboy
  * @date 2024-12-07

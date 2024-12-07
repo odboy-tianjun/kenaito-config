@@ -20,16 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class DemoController {
   @Value("${kenaito.config-center.test}")
   private String testStr;
-
+  private final ConfigCenterProperties configCenterProperties;
   private final ClientPropertyHelper clientPropertyHelper;
 
   /** 配置变化了 */
   @GetMapping("/test")
   public ResponseEntity<Object> test() {
-    System.err.println("testStr=" + testStr);
     String propertyName = "kenaito.config-center.test";
+    System.err.println("@Value注解的值1=" + testStr);
+    System.err.println("@ConfigurationProperties注解的值1=" + configCenterProperties.getTest());
     clientPropertyHelper.updateValue(propertyName, "Hello World");
-    System.err.println("testStr=" + testStr);
+    System.err.println("@Value注解的值2=" + testStr);
+    System.err.println("@ConfigurationProperties注解的值2=" + configCenterProperties.getTest());
     return ResponseEntity.ok("success");
   }
 }

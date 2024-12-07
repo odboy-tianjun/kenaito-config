@@ -21,4 +21,5 @@ public class ConfigCenterProperties {
   private String dataId;
   private String env;
   private String cacheDir;
+  private String test;
 }

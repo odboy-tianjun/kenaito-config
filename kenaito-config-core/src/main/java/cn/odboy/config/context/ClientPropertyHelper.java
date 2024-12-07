@@ -3,6 +3,8 @@ package cn.odboy.config.context;
 import cn.hutool.core.util.StrUtil;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.context.refresh.ConfigDataContextRefresher;
+import org.springframework.cloud.context.refresh.ContextRefresher;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 public class ClientPropertyHelper {
   private final ConfigurableEnvironment environment;
   private final ValueAnnotationProcessor valueAnnotationProcessor;
+  private final ConfigDataContextRefresher configDataContextRefresher;
 
   /**
    * 动态更新配置值
@@ -40,6 +43,10 @@ public class ClientPropertyHelper {
       }
       // 单独更新@Value对应的值
       valueAnnotationProcessor.setValue(propertyName, value);
+      // 刷新上下文(解决 @ConfigurationProperties注解的类属性值更新 问题)
+      // Spring Cloud只会对被@RefreshScope和@ConfigurationProperties标注的bean进行刷新
+      // 这个方法主要做了两件事：刷新配置源，也就是PropertySource，然后刷新了@ConfigurationProperties注解的类
+      configDataContextRefresher.refresh();
     }
   }
 }
