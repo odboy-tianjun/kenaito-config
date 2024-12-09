@@ -1,6 +1,7 @@
 package cn.odboy.config.netty;
 
-import cn.odboy.config.context.ClientConfigLoader;
+import cn.odboy.config.constant.ClientConfigConsts;
+import cn.odboy.config.constant.ClientConfigVars;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -139,11 +140,11 @@ public class ConfigClient {
                 retryCount++;
                 logger.info("当前重试次数: {}", retryCount);
                 if (retryCount >= MAX_RETRY_COUNT) {
-                    ClientConfigLoader.isConfigLoaded = true;
-                    ClientConfigLoader.isServerOffline = true;
-                    synchronized (ClientConfigLoader.clientInfo) {
+                    ClientConfigVars.isConfigLoaded = true;
+                    ClientConfigVars.isServerOffline = true;
+                    synchronized (ClientConfigConsts.clientInfo) {
                         // 通知等待的线程
-                        ClientConfigLoader.clientInfo.notifyAll();
+                        ClientConfigConsts.clientInfo.notifyAll();
                     }
                 } else {
                     // 进行重连
@@ -162,8 +163,8 @@ public class ConfigClient {
     protected void reConnect() {
         try {
             logger.info("重连配置中心服务 {}:{}", this.serverIp, this.serverPort);
-            ClientConfigLoader.isConfigLoaded = false;
-            ClientConfigLoader.isServerOffline = false;
+            ClientConfigVars.isConfigLoaded = false;
+            ClientConfigVars.isServerOffline = false;
             if (channel != null && channel.isOpen()) {
                 logger.info("Channel已激活, 关闭且重启中...");
                 channel.close();

@@ -13,13 +13,17 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("config_app_user")
-public class ConfigAppUser {
-  /** 应用名称 */
+@TableName("config_user")
+public class ConfigUser {
+  /** 应用id */
   @TableField("app_id")
   private Long appId;
 
-  /** 应用名称 */
+  /** 环境编码 */
+  @TableField("env_code")
+  private String envCode;
+
+  /** 用户id */
   @TableField("user_id")
   private Long userId;
 }

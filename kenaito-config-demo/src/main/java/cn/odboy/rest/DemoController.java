@@ -1,6 +1,6 @@
 package cn.odboy.rest;
 
-import cn.odboy.config.context.ClientPropertyHelper;
+import cn.odboy.config.context.ClientPropertyRefresher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ public class DemoController {
   @Value("${kenaito.config-center.test}")
   private String testStr;
   private final ConfigCenterProperties configCenterProperties;
-  private final ClientPropertyHelper clientPropertyHelper;
+  private final ClientPropertyRefresher clientPropertyRefresher;
 
   /** 配置变化了 */
   @GetMapping("/test")
@@ -29,7 +29,7 @@ public class DemoController {
     String propertyName = "kenaito.config-center.test";
     System.err.println("@Value注解的值1=" + testStr);
     System.err.println("@ConfigurationProperties注解的值1=" + configCenterProperties.getTest());
-    clientPropertyHelper.updateValue(propertyName, "Hello World");
+    clientPropertyRefresher.updateValue(propertyName, "Hello World");
     System.err.println("@Value注解的值2=" + testStr);
     System.err.println("@ConfigurationProperties注解的值2=" + configCenterProperties.getTest());
     return ResponseEntity.ok("success");

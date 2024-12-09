@@ -2,6 +2,8 @@ package cn.odboy.config.netty;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.odboy.config.constant.ClientConfigConsts;
+import cn.odboy.config.constant.ClientConfigVars;
 import cn.odboy.config.constant.TransferMessageType;
 import cn.odboy.config.context.ClientConfigLoader;
 import cn.odboy.config.model.SmallMessage;
@@ -45,7 +47,7 @@ public class ConfigClientHandler extends ChannelInboundHandlerAdapter {
         /// logger.info("当Channel处于活动状态（已经连接到它的远程节点）时被调用, 注册客户端");
         SmallMessage smallMessage = new SmallMessage();
         smallMessage.setType(TransferMessageType.REGISTER);
-        smallMessage.setResp(SmallMessage.Response.ok(ClientConfigLoader.clientInfo));
+        smallMessage.setResp(SmallMessage.Response.ok(ClientConfigConsts.clientInfo));
         ctx.writeAndFlush(MessageUtil.toByteBuf(smallMessage));
     }
 
@@ -106,12 +108,12 @@ public class ConfigClientHandler extends ChannelInboundHandlerAdapter {
                         }
                     }
                     logger.info("配置文件转map成功");
-                    ClientConfigLoader.originConfigs = originConfigs;
-                    ClientConfigLoader.lastConfigs = lastConfigs;
-                    ClientConfigLoader.isConfigLoaded = true;
-                    synchronized (ClientConfigLoader.clientInfo) {
+                    ClientConfigVars.originConfigs = originConfigs;
+                    ClientConfigVars.lastConfigs = lastConfigs;
+                    ClientConfigVars.isConfigLoaded = true;
+                    synchronized (ClientConfigConsts.clientInfo) {
                         // 通知所有等待的线程
-                        ClientConfigLoader.clientInfo.notifyAll();
+                        ClientConfigConsts.clientInfo.notifyAll();
                     }
                 } catch (IOException e) {
                     logger.info("配置文件转map失败", e);

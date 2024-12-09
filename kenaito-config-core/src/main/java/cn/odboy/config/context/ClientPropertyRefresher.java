@@ -1,8 +1,9 @@
 package cn.odboy.config.context;
 
 import cn.hutool.core.util.StrUtil;
+import cn.odboy.config.constant.ClientConfigConsts;
+import cn.odboy.config.constant.ClientConfigVars;
 import lombok.RequiredArgsConstructor;
-//import org.springframework.cloud.context.refresh.ConfigDataContextRefresher;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
@@ -21,10 +22,10 @@ import java.util.Map;
  */
 @Component
 @RequiredArgsConstructor
-public class ClientPropertyHelper {
+public class ClientPropertyRefresher {
     private final ConfigurableEnvironment environment;
     private final ValueAnnotationProcessor valueAnnotationProcessor;
-//    private final ConfigDataContextRefresher configDataContextRefresher;
+    //    private final ConfigDataContextRefresher configDataContextRefresher;
     private final ConfigPropertyContextRefresher contextRefresher;
 
     /**
@@ -37,9 +38,9 @@ public class ClientPropertyHelper {
         if (StrUtil.isNotBlank(propertyName)) {
             // 设置属性值
             MutablePropertySources propertySources = environment.getPropertySources();
-            if (propertySources.contains(ClientConfigLoader.PROPERTY_SOURCE_NAME)) {
+            if (propertySources.contains(ClientConfigConsts.PROPERTY_SOURCE_NAME)) {
                 // 更新属性值
-                PropertySource<?> propertySource = propertySources.get(ClientConfigLoader.PROPERTY_SOURCE_NAME);
+                PropertySource<?> propertySource = propertySources.get(ClientConfigConsts.PROPERTY_SOURCE_NAME);
                 Map<String, Object> source = ((MapPropertySource) propertySource).getSource();
                 source.put(propertyName, value);
             }
@@ -49,6 +50,22 @@ public class ClientPropertyHelper {
             // Spring Cloud只会对被@RefreshScope和@ConfigurationProperties标注的bean进行刷新
             // 这个方法主要做了两件事：刷新配置源，也就是PropertySource，然后刷新了@ConfigurationProperties注解的类
 //            configDataContextRefresher.refresh();
+            contextRefresher.refreshAll();
+        }
+    }
+
+    public void updateAll() {
+        // 设置属性值
+        MutablePropertySources propertySources = environment.getPropertySources();
+        if (propertySources.contains(ClientConfigConsts.PROPERTY_SOURCE_NAME)) {
+            // 更新属性值
+            PropertySource<?> propertySource = propertySources.get(ClientConfigConsts.PROPERTY_SOURCE_NAME);
+            Map<String, Object> source = ((MapPropertySource) propertySource).getSource();
+            for (Map.Entry<String, Object> kvMap : ClientConfigVars.cacheConfigs.entrySet()) {
+                source.put(kvMap.getKey(), kvMap.getValue());
+                // 单独更新@Value对应的值
+                valueAnnotationProcessor.setValue(kvMap.getKey(), kvMap.getValue());
+            }
             contextRefresher.refreshAll();
         }
     }

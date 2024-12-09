@@ -1,5 +1,7 @@
 package cn.odboy.config.context;
 
+import cn.odboy.config.constant.ClientConfigConsts;
+import cn.odboy.config.constant.ClientConfigVars;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -32,15 +34,15 @@ public class ConfigPropertyContextRefresher {
      */
     public void refreshSingle(String propertyName, Object value) {
         MutablePropertySources propertySources = environment.getPropertySources();
-        if (propertySources.contains(ClientConfigLoader.PROPERTY_SOURCE_NAME)) {
+        if (propertySources.contains(ClientConfigConsts.PROPERTY_SOURCE_NAME)) {
             // 更新属性值
-            PropertySource<?> propertySource = propertySources.get(ClientConfigLoader.PROPERTY_SOURCE_NAME);
+            PropertySource<?> propertySource = propertySources.get(ClientConfigConsts.PROPERTY_SOURCE_NAME);
             Map<String, Object> source = ((MapPropertySource) propertySource).getSource();
             source.put(propertyName, value);
         } else {
             // 新增属性值
             Map<String, Object> propertyMap = new HashMap<>(1);
-            MapPropertySource propertySource = new MapPropertySource(ClientConfigLoader.PROPERTY_SOURCE_NAME, propertyMap);
+            MapPropertySource propertySource = new MapPropertySource(ClientConfigConsts.PROPERTY_SOURCE_NAME, propertyMap);
             propertySources.addFirst(propertySource);
         }
         // 使用 Binder 重新绑定 @ConfigurationProperties
@@ -55,14 +57,14 @@ public class ConfigPropertyContextRefresher {
      */
     public void refreshAll() {
         MutablePropertySources propertySources = environment.getPropertySources();
-        if (propertySources.contains(ClientConfigLoader.PROPERTY_SOURCE_NAME)) {
+        if (propertySources.contains(ClientConfigConsts.PROPERTY_SOURCE_NAME)) {
             // 替换属性值
-            MapPropertySource propertySource = new MapPropertySource(ClientConfigLoader.PROPERTY_SOURCE_NAME, ClientConfigLoader.cacheConfigs);
-            propertySources.replace(ClientConfigLoader.PROPERTY_SOURCE_NAME, propertySource);
+            MapPropertySource propertySource = new MapPropertySource(ClientConfigConsts.PROPERTY_SOURCE_NAME, ClientConfigVars.cacheConfigs);
+            propertySources.replace(ClientConfigConsts.PROPERTY_SOURCE_NAME, propertySource);
         } else {
             // 新增属性值
             Map<String, Object> propertyMap = new HashMap<>(1);
-            MapPropertySource propertySource = new MapPropertySource(ClientConfigLoader.PROPERTY_SOURCE_NAME, propertyMap);
+            MapPropertySource propertySource = new MapPropertySource(ClientConfigConsts.PROPERTY_SOURCE_NAME, propertyMap);
             propertySources.addFirst(propertySource);
         }
         // 使用 Binder 重新绑定 @ConfigurationProperties

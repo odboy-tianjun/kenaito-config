@@ -19,5 +19,9 @@ import java.util.List;
 @Mapper
 public interface ConfigFileMapper extends BaseMapper<ConfigFile> {
 
-    List<ConfigFileInfo> selectByEnvAndAppName(@Param("env") String env, @Param("dataId") String dataId);
+    List<ConfigFileInfo> selectInfoByEnvAndAppName(@Param("envCode") String envCode, @Param("dataId") String dataId);
+
+    List<ConfigFile.QueryList> selectDetailByEnvAndAppId(@Param("envCode") String envCode, @Param("appId") Long appId);
+
+    String selectContentByFileId(@Param("id") Long id);
 }

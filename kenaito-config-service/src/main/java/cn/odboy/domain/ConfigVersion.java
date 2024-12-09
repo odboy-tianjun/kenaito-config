@@ -24,6 +24,10 @@ public class ConfigVersion extends MyObject {
   @TableField("file_content")
   private String fileContent;
 
+  /** 配置文件类型 */
+  @TableField("file_type")
+  private String fileType;
+
   /** 配置文件内容版本 */
   @TableField("version")
   private Long version;
