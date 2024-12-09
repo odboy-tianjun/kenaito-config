@@ -18,4 +18,6 @@ public interface ConfigAppEnvService extends IService<ConfigAppEnv> {
     void create(ConfigAppEnv args);
 
     List<SelectOption> queryList(ConfigAppEnv args);
+
+    void remove(ConfigAppEnv args);
 }

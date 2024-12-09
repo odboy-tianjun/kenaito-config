@@ -37,4 +37,10 @@ public class ConfigEnvController {
     public ResponseEntity<Object> queryList(@Validated @RequestBody ConfigAppEnv args) {
         return new ResponseEntity<>(configAppEnvService.queryList(args), HttpStatus.OK);
     }
+
+    @PostMapping("/remove")
+    public ResponseEntity<Object> remove(@Validated @RequestBody ConfigAppEnv args) {
+        configAppEnvService.remove(args);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

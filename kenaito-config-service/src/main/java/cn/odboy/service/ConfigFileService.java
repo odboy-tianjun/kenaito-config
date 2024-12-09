@@ -35,4 +35,6 @@ public interface ConfigFileService extends IService<ConfigFile> {
     String getContentById(ConfigFile args);
 
     void upload(Long appId, String envCode, MultipartFile file) throws Exception;
+
+    List<ConfigFile> getByAppIdEnvCode(Long appId, String envCode);
 }
