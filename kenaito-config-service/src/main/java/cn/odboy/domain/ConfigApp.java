@@ -65,9 +65,9 @@ public class ConfigApp extends MyNormalEntity {
     @Data
     public static class QueryClientArgs {
         @NotBlank(message = "必填")
-        private String env;
+        private String envCode;
         @NotBlank(message = "必填")
-        private String dataId;
+        private String appName;
     }
 
     @Data

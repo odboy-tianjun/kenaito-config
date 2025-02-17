@@ -71,11 +71,7 @@ public class ConfigAppEnvServiceImpl extends ServiceImpl<ConfigAppEnvMapper, Con
       List<Long> configFileId =
           configFiles.stream().map(ConfigFile::getId).collect(Collectors.toList());
       configFileService.removeBatchByIds(configFileId);
-      Long fileId = configFileId.stream().findFirst().orElse(null);
-      if (fileId != null) {
-        // delete from config_version
-        configVersionService.removeBatchByFileId(fileId);
-      }
+        configFileId.stream().findFirst().ifPresent(configVersionService::removeBatchByFileId);
     }
   }
 }

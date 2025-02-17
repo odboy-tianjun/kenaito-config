@@ -117,9 +117,7 @@ public class ClientConfigLoader {
               ClientConfigConsts.clientInfo.wait();
             } catch (InterruptedException e) {
               Thread currentThread = Thread.currentThread();
-              String currentThreadName = currentThread.getName();
               currentThread.interrupt();
-              logger.error("中断线程: {}", currentThreadName, e);
             }
           }
           // 判断配置中心服务是否处于离线状态
@@ -175,32 +173,48 @@ public class ClientConfigLoader {
     };
   }
 
+  /**
+   * 初始化客户端信息
+   *
+   * @param defaultCacheDir 默认缓存目录如果环境变量中未指定缓存目录，则使用此默认值
+   * @param environment 应用程序环境变量用于从中获取配置信息
+   */
   private static void initClientInfo(String defaultCacheDir, ConfigurableEnvironment environment) {
+    // 设置服务器地址
     ClientConfigConsts.clientInfo.setServer(
         environment.getProperty(
             ClientConfigConsts.DEFAULT_CONFIG_NAME_SERVER,
             String.class,
             ClientConfigConsts.DEFAULT_CONFIG_SERVER));
+    // 设置端口
     ClientConfigConsts.clientInfo.setPort(
         environment.getProperty(
             ClientConfigConsts.DEFAULT_CONFIG_NAME_PORT,
             Integer.class,
             ClientConfigConsts.DEFAULT_CONFIG_PORT));
+    // 设置环境
     ClientConfigConsts.clientInfo.setEnv(
         environment.getProperty(
             ClientConfigConsts.DEFAULT_CONFIG_NAME_ENV,
             String.class,
             ClientConfigConsts.DEFAULT_CONFIG_ENV));
+    // 设置数据ID
     ClientConfigConsts.clientInfo.setDataId(
         environment.getProperty(
             ClientConfigConsts.DEFAULT_CONFIG_NAME_DATA_ID,
             String.class,
             ClientConfigConsts.DEFAULT_CONFIG_DATA_ID));
+    // 设置缓存目录
     ClientConfigConsts.clientInfo.setCacheDir(
         environment.getProperty(
             ClientConfigConsts.DEFAULT_CONFIG_NAME_CACHE_DIR, String.class, defaultCacheDir));
   }
 
+  /**
+   * 获取默认的缓存目录路径 根据操作系统类型返回对应的缓存目录路径
+   *
+   * @return 默认的缓存目录路径
+   */
   private static String getDefaultCacheDir() {
     String defaultCacheDir;
     String os = System.getProperty("os.name");
@@ -209,16 +223,25 @@ public class ClientConfigLoader {
     } else if (os.toLowerCase().startsWith(ClientConfigConsts.OS_TYPE_MAC)) {
       defaultCacheDir = ClientConfigConsts.DEFAULT_PATH_MAC;
     } else {
+      // 对于未知操作系统，默认使用Mac操作系统的缓存路径
       defaultCacheDir = ClientConfigConsts.DEFAULT_PATH_MAC;
     }
     return defaultCacheDir;
   }
 
+  /**
+   * 验证缓存目录路径的合法性 确保提供的缓存路径与默认路径格式相符，防止路径配置错误
+   *
+   * @param defaultCacheDir 默认的缓存目录路径
+   * @param cacheDir 用户配置的缓存目录路径
+   */
   private static void validateCacheDirPath(String defaultCacheDir, String cacheDir) {
+    // 检查是否为Windows系统默认路径格式，且用户配置的路径是否符合该格式
     if (defaultCacheDir.contains(ClientConfigConsts.DEFAULT_PATH_WIN_SEP)
         && !cacheDir.contains(ClientConfigConsts.DEFAULT_PATH_WIN_SEP)) {
       throw new RuntimeException(ClientConfigConsts.DEFAULT_CONFIG_NAME_CACHE_DIR + " 配置的路径不正确");
     }
+    // 检查用户配置的路径是否包含Windows系统路径分隔符，且是否正确使用
     if (cacheDir.contains(ClientConfigConsts.DEFAULT_PATH_WIN_SEP)
         && !cacheDir.contains(ClientConfigConsts.DEFAULT_PATH_SEP_WIN)) {
       throw new RuntimeException(
@@ -228,11 +251,20 @@ public class ClientConfigLoader {
     }
   }
 
-  /** 创建缓存文件夹 */
+  /**
+   * 创建缓存目录 如果目录不存在，将尝试创建它并检查写权限
+   *
+   * @param cacheDir 缓存目录的路径
+   * @throws RuntimeException 如果目录创建失败或没有写权限
+   */
   private static void createCacheDir(String cacheDir) {
+    // 获取缓存目录的路径对象
     Path path = Paths.get(cacheDir);
+    // 检查缓存目录是否存在，如果不存在则尝试创建
     if (!Files.exists(path)) {
+      // 使用FileUtil工具类创建目录
       File mkdir = FileUtil.mkdir(cacheDir);
+      // 检查创建后的目录是否可写，如果不可写则抛出异常
       if (!mkdir.canWrite()) {
         throw new RuntimeException("缓存文件夹创建失败, 无读写权限");
       }
